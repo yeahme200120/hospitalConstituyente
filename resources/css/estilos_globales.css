@@ -1,0 +1,15 @@
+.fondo-principal{
+    background-color: #28a58d;
+}
+.btn-principal{
+    background-color: #28a58d;
+    color: white;
+}
+.fondo-azul{
+    background-color: #162f46;
+}
+.btn-secundario{
+    background-color: #162f46;
+    color: white;
+    border-radius: 1rem;
+}
