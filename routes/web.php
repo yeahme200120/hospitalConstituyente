@@ -10,3 +10,4 @@ Route::get('/', function () {
 });
 
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+Route::get('/formulario', [App\Http\Controllers\HomeController::class, 'formulario'])->name('formulario');

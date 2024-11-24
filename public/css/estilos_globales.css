@@ -1,3 +1,7 @@
+:root{
+    --color-principal:#28a58d;
+    --color-secundario-azul: #162f46;
+}
 .fondo-principal{
     background-color: #28a58d;
 }
@@ -12,4 +16,30 @@
     background-color: #162f46;
     color: white;
     border-radius: 1rem;
+}
+.colorAzul{
+    color: var(--color-secundario-azul);
+}
+.cabeceraImg{
+    position: fixed; /* Hace que el div permanezca fijo al desplazarte */
+    top: 0px;    /* Posición desde la parte inferior */
+    left: -12px;     /* Posición desde la parte derecha */
+    color: white;    /* Color del texto */
+    border-radius: 10px; /* Esquinas redondeadas */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Sombra */
+    cursor: pointer; /* Cambia el cursor al pasar por encima */
+    z-index: 1000;   /* Asegura que esté por encima de otros elementos */
+}
+.botonMenuPrincipal{
+    background-color: var(--color-principal);
+    border-radius: 3rem;
+    color: #fff;
+    font-weight: bold;
+    font-size: 2rem;
+}
+.centrarTexto{
+    display: flex;               /* Activa Flexbox */
+    justify-content: center;     /* Centra horizontalmente */
+    align-items: center;         /* Centra verticalmente */
+    padding: 3%;
 }
