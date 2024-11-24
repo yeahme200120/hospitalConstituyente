@@ -26,5 +26,6 @@
             <i class="bi bi-card-checklist colorAzul" style="font-size:8rem;"></i>
         </div>
     </div>
+    
 </div>
 @endsection
