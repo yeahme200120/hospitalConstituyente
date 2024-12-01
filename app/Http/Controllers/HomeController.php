@@ -26,7 +26,14 @@ class HomeController extends Controller
         return view('home');
         //return view('/login');
     }
-    public function formulario(){
-        return view("formulario");
+    public function master()
+    {
+        return "Vista master";
+    }
+    public function seguimiento(){
+        return view("seguimiento");
+    }
+    public function registrarSeguimiento(){
+        return "Prueba de validacion temporal";
     }
 }

@@ -3,9 +3,9 @@
 @section('content')
 <div class="container pt-5">
     <div class="row justify-content-center botonMenuPrincipal">
-        <div class="col-8 p-5">
+        <a class="col-8 p-5 text-white" href="{{ route('seguimiento') }}">
             <label class="centrarTexto">INGRESAR PACIENTE NUEVO </label>
-        </div>
+        </a>
         <div class="col-4">
             <i class="bi bi-person-fill-add colorAzul" style="font-size:8rem;"></i>
         </div>

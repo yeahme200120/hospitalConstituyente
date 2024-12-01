@@ -10,4 +10,6 @@ Route::get('/', function () {
 });
 
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
-Route::get('/formulario', [App\Http\Controllers\HomeController::class, 'formulario'])->name('formulario');
+Route::get('/master', [App\Http\Controllers\HomeController::class, 'master'])->name('master');
+Route::get('/seguimiento', [App\Http\Controllers\HomeController::class, 'seguimiento'])->name('seguimiento');
+Route::post('/registrarSeguimiento', [App\Http\Controllers\HomeController::class, 'registrarSeguimiento'])->name('registrarSeguimiento');
