@@ -6,5 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class CatalogoViaAdministracion extends Model
 {
-    //
+    protected $fillable = [
+        'via'
+    ];
 }

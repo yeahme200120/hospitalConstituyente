@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('ingresos', function (Blueprint $table) {
             $table->id();
+            $table->integer("paciente_id");
             $table->integer("ingreso_dia");
             $table->integer("ingreso_mes");
             $table->bigInteger("ingreso_año");

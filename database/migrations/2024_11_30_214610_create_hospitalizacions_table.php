@@ -13,22 +13,24 @@ return new class extends Migration
     {
         Schema::create('hospitalizacions', function (Blueprint $table) {
             $table->id();
-            $table->integer("id_paciente");
+            $table->integer("paciente_id");
             $table->string("medicamento");
             $table->string("dosis_max",8,2);
             $table->string("dosis_administrada");
             $table->integer("id_via_administracion");
             $table->string("intervalo");
+            $table->string("servicio");
             $table->time("horario");
-            $table->date("fecha_inicio");
-            $table->date("fecha_termino")->nullable();
-            $table->boolean("duplicidad");
-            $table->boolean("intervencion");
-            $table->boolean("acepatcion");
+            $table->bigInteger("diaInicio");
+            $table->string("mesInicio");
+            $table->bigInteger("anioInicio");
+            $table->bigInteger("diaTermino")->nullable();
+            $table->string("mesTermino")->nullable();
+            $table->bigInteger("anioTermino")->nullable();
+            $table->string("intervencion");
             $table->string("interacciones");
             $table->string("contraindicaciones");
             $table->string("recomendacion");
-            $table->string("intervencion_text");
             $table->string("otros");
             $table->string("accion_tomada");
             $table->timestamps();

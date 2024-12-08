@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('catalogo_enfermedades_cronicas', function (Blueprint $table) {
             $table->id();
+            $table->string("enfermedad");
             $table->timestamps();
         });
     }

@@ -104,14 +104,12 @@
                                                 <label for="enfermedades_cronicas">Enfermedades crónicas:</label>
                                             </div>
                                             <div class="col">
-                                                <select class="form-select" id="enfermedades_cronicas"
-                                                    name="enfermedades_cronicas">
-                                                    <option value="" selected disabled>Selecciona una opcion...
-                                                    </option>
-                                                    @foreach ($enfermedades as $enfermedad)
-                                                        <option value="{{ $enfermedad->id }}">
-                                                            {{ $enfermedad->enfermedad }}</option>
-                                                    @endforeach
+                                                <select name="enfermedades_cronicas" id="enfermedades_cronicas"
+                                                    class="form-control" name="enfermedades">
+                                                    <option value="1">Diabetes</option>
+                                                    <option value="2">Hipertensión</option>
+                                                    <option value="3">Asma</option>
+                                                    <option value="4">Otra</option>
                                                 </select>
                                                 @error('enfermedades_cronicas')
                                                     <div class="alert alert-danger">{{ $message }}</div>
@@ -207,53 +205,41 @@
                                         <div class="alert alert-danger">{{ $message }}</div>
                                     @enderror
                                 </div>
-                                <div class="row">
-                                    <div class="col-12 col-md-6">
-                                        <!-- Diagnóstico de Ingreso -->
-                                        <div class="form-group">
-                                            <label for="diagnostico_ingreso">Diagnóstico de Ingreso:</label>
-                                            <textarea name="diagnostico_ingreso" id="diagnostico_ingreso" class="form-control" rows="3"></textarea>
-                                            @error('diagnostico_ingreso')
-                                                <div class="alert alert-danger">{{ $message }}</div>
-                                            @enderror
-                                        </div>
-                                    </div>
-                                    <div class="col-12 col-md-6">
-                                        <div class="row">
-                                            <!-- Servicio -->
-                                            <div class="form-group">
-                                                <label for="servicio">Servicio:</label>
-                                                <select class="form-select" id="servicio" name="servicio">
-                                                    <option value="" selected disabled>Selecciona un servicio...
-                                                    </option>
-                                                    @foreach ($servicios as $servicio)
-                                                        <option value="{{ $servicio->id }}">{{ $servicio->servicio }}
-                                                        </option>
-                                                    @endforeach
-                                                </select>
-                                                @error('servicio')
-                                                    <div class="alert alert-danger">{{ $message }}</div>
-                                                @enderror
-                                            </div>
 
-                                        </div>
-                                        <div class="row">
-                                            <!-- Cama -->
-                                            <div class="form-group">
-                                                <label for="cama">Cama:</label>
-                                                <select class="form-select" id="cama" name="cama">
-                                                    <option value="" selected disabled>Selecciona una via de
-                                                        administración...</option>
-                                                    @foreach ($camas as $cama)
-                                                        <option value="{{ $cama->id }}">{{ $cama->cama }}</option>
-                                                    @endforeach
-                                                </select>
-                                                @error('cama')
-                                                    <div class="alert alert-danger">{{ $message }}</div>
-                                                @enderror
-                                            </div>
-                                        </div>
-                                    </div>
+                                <!-- Diagnóstico de Ingreso -->
+                                <div class="form-group">
+                                    <label for="diagnostico_ingreso">Diagnóstico de Ingreso:</label>
+                                    <textarea name="diagnostico_ingreso" id="diagnostico_ingreso" class="form-control" rows="3"></textarea>
+                                    @error('diagnostico_ingreso')
+                                        <div class="alert alert-danger">{{ $message }}</div>
+                                    @enderror
+                                </div>
+
+                                <!-- Servicio -->
+                                <div class="form-group">
+                                    <label for="servicio">Servicio:</label>
+                                    <select name="servicio" id="servicio" class="form-control">
+                                        <option value="1">Hospitalización</option>
+                                        <option value="2">Urgencia</option>
+                                        <option value="3">Quirofano</option>
+                                    </select>
+                                    @error('servicio')
+                                        <div class="alert alert-danger">{{ $message }}</div>
+                                    @enderror
+                                </div>
+
+                                <!-- Cama -->
+                                <div class="form-group">
+                                    <label for="cama">Cama:</label>
+                                    <select name="cama" id="cama" class="form-control">
+                                        <option value="1">Cama 1</option>
+                                        <option value="2">Cama 2</option>
+                                        <option value="3">Cama 3</option>
+                                        <option value="4">Cama 4</option>
+                                    </select>
+                                    @error('cama')
+                                        <div class="alert alert-danger">{{ $message }}</div>
+                                    @enderror
                                 </div>
                             </div>
                         </div>
@@ -365,15 +351,6 @@
             </form>
         </div>
     </div>
-    <script>
-        @if (session('success'))
-            toastr.success('{{ session('success') }}');
-        @endif
-    
-        @if (session('error'))
-            toastr.error('{{ session('error') }}');
-        @endif
-    </script>
     <script>
         $(document).ready(function() {
             @if ($errors->any())

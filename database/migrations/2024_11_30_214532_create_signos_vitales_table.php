@@ -13,6 +13,15 @@ return new class extends Migration
     {
         Schema::create('signos_vitales', function (Blueprint $table) {
             $table->id();
+            $table->integer("paciente_id");
+            $table->string("frecuencia_cardiaca",8,2);
+            $table->string("tension_arterial");
+            $table->string("pulso");
+            $table->integer("temperatura");
+            $table->integer("frecuencia_respiratoria");
+            $table->string("oxigenacion");
+            $table->float("peso",8,2);
+            $table->float("talla",8,2);
             $table->timestamps();
         });
     }

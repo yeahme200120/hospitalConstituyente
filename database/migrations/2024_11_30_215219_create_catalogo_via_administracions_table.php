@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('catalogo_via_administracions', function (Blueprint $table) {
             $table->id();
+            $table->string("via");
             $table->timestamps();
         });
     }

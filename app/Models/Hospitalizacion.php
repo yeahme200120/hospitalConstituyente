@@ -7,22 +7,24 @@ use Illuminate\Database\Eloquent\Model;
 class Hospitalizacion extends Model
 {
     protected $fillable = [
-        "id_paciente", 
+        "paciente_id", 
         "medicamento", 
         "dosis_max", 
         "dosis_administrada", 
         "id_via_administracion", 
         "intervalo", 
+        "servicio",
         "horario",
-        "fecha_inicio",
-        "fecha_termino",
-        "duplicidad",
+        "diaInicio",
+        "mesInicio",
+        "anioInicio",
+        "diaTermino",
+        "mesTermino",
+        "anioTermino",
         "intervencion",
-        "acepatcion",
         "interacciones",
         "contraindicaciones",
         "recomendacion",
-        "intervencion_text",
         "otros",
         "accion_tomada"
     ];

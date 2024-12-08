@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('tratatamientos', function (Blueprint $table) {
             $table->id();
+            $table->integer("paciente_id");
             $table->integer("id_medico");
             $table->string("diagnostico_agregado");
             $table->string("diagnostico_egreso");

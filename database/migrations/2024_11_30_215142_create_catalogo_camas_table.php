@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('catalogo_camas', function (Blueprint $table) {
             $table->id();
+            $table->string("cama");
             $table->timestamps();
         });
     }

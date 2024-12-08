@@ -43,3 +43,8 @@
     align-items: center;         /* Centra verticalmente */
     padding: 3%;
 }
+.btn-table-header{
+    background-color: #28a58d;
+    color: white;
+    border-radius: 2rem;
+}
