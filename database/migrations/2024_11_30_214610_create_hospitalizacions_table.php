@@ -18,6 +18,10 @@ return new class extends Migration
             $table->string("dosis_max",8,2);
             $table->string("dosis_administrada");
             $table->integer("id_via_administracion");
+            $table->string("opcion_duplicidad")->nullable();
+            $table->string("opcion_intervencion")->nullable();
+            $table->string("opcion_aceptacion")->nullable();
+            $table->string("opcion_sin_cambios")->nullable();
             $table->string("intervalo");
             $table->string("servicio");
             $table->time("horario");

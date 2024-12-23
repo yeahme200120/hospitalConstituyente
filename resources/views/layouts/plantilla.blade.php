@@ -33,10 +33,10 @@
         <nav class="navbar navbar-expand-md navbar-light fondo-azul">
             <div class="container-fluid">
                 <div class="collapse navbar-collapse row" id="navbarSupportedContent">
-                    <div class="col-1 fondo-principal cabeceraImg">
+                    <a href="/home" class="col-1 fondo-principal cabeceraImg" onclick="redirect()">
                         <img src="{{ asset('img/Cabecera.png') }}" alt=""
                             style="margin:0; padding:0; position:fixed;" width="210">
-                    </div>
+                    </a>
                     <form method="POST" action="{{ route('logout') }}" class="col-10 text-end text-white p-2">
                         @csrf
                         <button class="text-white" type="submit"
@@ -53,5 +53,7 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js
     "></script>
 </body>
-
+<script>
+    
+</script>
 </html>

@@ -2,6 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\HospitalizacionExport;
+use App\Exports\IngresosExport;
+use App\Exports\PacientesExport;
+use App\Exports\SignosExport;
+use App\Exports\TratamientoExport;
 use App\Models\CatalogoCamas;
 use App\Models\CatalogoEnfermedadesCronicas;
 use App\Models\CatalogoMedicos;
@@ -13,6 +18,7 @@ use App\Models\Pacientes;
 use App\Models\SignosVitales;
 use App\Models\Tratatamiento;
 use Illuminate\Http\Request;
+use Maatwebsite\Excel\Facades\Excel;
 
 class HomeController extends Controller
 {
@@ -36,17 +42,23 @@ class HomeController extends Controller
         return view('home');
         //return view('/login');
     }
+    public function index2(Request $request)
+    {
+        return redirect()->route('home')->with('success', $request->mensaje);
+    }
     public function master()
     {
         return "Vista master";
     }
     public function seguimiento()
     {
+        $ultimoId = Pacientes::max('id');
+        $id = $ultimoId + 1;
         //Seccion de los catalogos a mostrar
         $enfermedades = CatalogoEnfermedadesCronicas::all();
         $servicios = CatalogoServicios::all();
         $camas = CatalogoCamas::all();
-        return view("seguimiento", compact("enfermedades", "servicios", "camas"));
+        return view("seguimiento", compact("id", "enfermedades", "servicios", "camas"));
     }
     public function registrarSeguimiento(Request $request)
     {
@@ -155,22 +167,22 @@ class HomeController extends Controller
         $signos->talla = $request->talla;
 
         if ($signos->save()) {
-            return redirect()->route('seguimientoTratamiento')->with('success', 'Registro correcto de Informacion personal, Ingresos y Signos Vitales');
+            return redirect()->route('seguimientoTratamiento', ['paciente' => $paciente->id])
+                ->with('success', 'Registro correcto de Informacion personal, Ingresos y Signos Vitales');
         } else {
             return 0;
         }
     }
     public function enHospital(Request $request)
     {
-        $hospitalizados = Hospitalizacion::
-        join('pacientes as p', 'p.id', '=', 'hospitalizacions.paciente_id')
-        ->join('catalogo_servicios as c', 'c.id', '=', 'hospitalizacions.paciente_id')
-        ->join('ingresos as i', 'i.paciente_id', '=', 'hospitalizacions.paciente_id')
-        ->join('catalogo_camas as camas', 'camas.id', '=', 'i.id_cama')
-        ->select('hospitalizacions.*', 'c.servicio','p.nombre','camas.cama')
-        ->paginate(10);
-       
-        return view("enHospital", compact("hospitalizados") );
+        $hospitalizados = Hospitalizacion::join('pacientes as p', 'p.id', '=', 'hospitalizacions.paciente_id')
+            ->join('catalogo_servicios as c', 'c.id', '=', 'hospitalizacions.paciente_id')
+            ->join('ingresos as i', 'i.paciente_id', '=', 'hospitalizacions.paciente_id')
+            ->join('catalogo_camas as camas', 'camas.id', '=', 'i.id_cama')
+            ->select('hospitalizacions.*', 'c.servicio', 'p.nombre', 'camas.cama')
+            ->paginate(10);
+
+        return view("enHospital", compact("hospitalizados"));
     }
     public function seguimientoTratamiento()
     {
@@ -178,7 +190,16 @@ class HomeController extends Controller
         $pacientes = Pacientes::all();
         $medicos = CatalogoMedicos::all();
         $vias = CatalogoViaAdministracion::all();
-        return view("seguimientoTratamiento",compact("pacientes","medicos","vias"));
+        return view("seguimientoTratamiento", compact("pacientes", "medicos", "vias"));
+    }
+    public function seguimientoTratamientoId($id)
+    {
+        //Seccion de los
+
+        $paciente = $id;
+        $medicos = CatalogoMedicos::all();
+        $vias = CatalogoViaAdministracion::all();
+        return view("seguimientoTratamiento", compact("paciente", "medicos", "vias"));
     }
     public function registrarSeguimiento2(Request $request)
     {
@@ -186,9 +207,7 @@ class HomeController extends Controller
             'pacienteId' => 'required',
             'medicoTratante' => 'required',
             'diagnosticoAgregado' => 'required',
-            'diagnosticoEgreso' => 'required',
             'laboratorios' => 'required',
-
             'medicamento' => 'required',
             'dosisMaxima' => 'required',
             'dosisAdministrada' => 'required',
@@ -205,13 +224,12 @@ class HomeController extends Controller
             'intervencion' => 'required',
             'otros' => 'required',
             'accionTomada' => 'required',
-        ];        
+        ];
 
         $messages = [
             'pacienteId.required' => 'El campo Paciente es un campo obligatorio.',
             'medicoTratante.required' => 'El campo Medico tratante es un campo obligatorio.',
             'diagnosticoAgregado.required' => 'El campo diagnostico agregado es un campo obligatorio.',
-            'diagnosticoEgreso.required' => 'El campo Diagnostico Egreso es un campo obligatorio.',
             'laboratorios.required' => 'El campo Laboratorios es un campo obligatorio.',
             'medicamento.required' => 'El campo Medicamento es un campo obligatorio.',
             'dosisMaxima.required' => 'El campo Dosis maxima es un campo obligatorio.',
@@ -238,7 +256,7 @@ class HomeController extends Controller
         $tratamiento->paciente_id = $request->pacienteId;
         $tratamiento->id_medico = $request->medicoTratante;
         $tratamiento->diagnostico_agregado = $request->diagnosticoAgregado;
-        $tratamiento->diagnostico_egreso = $request->diagnosticoEgreso;
+        $tratamiento->diagnostico_egreso = !$request->diagnosticoEgreso ? '' : $request->diagnosticoEgreso;
         $tratamiento->laboratorios = $request->laboratorios;
 
         if ($tratamiento->save()) {
@@ -269,6 +287,10 @@ class HomeController extends Controller
         $hospitalizacion->intervencion = $request->intervencion;
         $hospitalizacion->otros = $request->otros;
         $hospitalizacion->accion_tomada = $request->accionTomada;
+        $hospitalizacion->opcion_duplicidad = !$request->opcion_duplicidad ? null : $request->opcion_duplicidad;
+        $hospitalizacion->opcion_intervencion = !$request->opcion_intervencion ? null : $request->opcion_intervencion;
+        $hospitalizacion->opcion_aceptacion = !$request->opcion_aceptacion ? null : $request->opcion_aceptacion;
+        $hospitalizacion->opcion_sin_cambios = !$request->opcion_sin_cambios ? null : $request->opcion_sin_cambios;
 
 
         if ($hospitalizacion->save()) {
@@ -278,35 +300,99 @@ class HomeController extends Controller
             array_push($respuesta, ["hospitalizacion" => 0]);
         }
     }
+    public function agregarMedicamento2(Request $request)
+    {
+        try {
+            //Registro de Hospitalización
+            $hospitalizacion = new Hospitalizacion();
+            $hospitalizacion->paciente_id = $request->pacienteId ? $request->pacienteId : 0;
+            $hospitalizacion->medicamento = $request->medicamento ? $request->medicamento : '';
+            $hospitalizacion->dosis_max = $request->dosisMaxima ? $request->dosisMaxima : 0;
+            $hospitalizacion->dosis_administrada = $request->dosisAdministrada ? $request->dosisAdministrada : 0;
+            $hospitalizacion->servicio = $request->servicio ? $request->servicio : 0;
+            $hospitalizacion->id_via_administracion = $request->via ? $request->via : 0;
+            $hospitalizacion->interacciones = $request->interacciones ? $request->interacciones : '';
+            $hospitalizacion->intervalo = $request->intervalo ? $request->intervalo : '';
+            $hospitalizacion->contraindicaciones = $request->contraindicaciones ? $request->contraindicaciones : '';
+            $hospitalizacion->horario = $request->horario ? $request->horario : '';
+            $hospitalizacion->recomendacion = $request->recomendacion ? $request->recomendacion : '';
+            $hospitalizacion->diaInicio = $request->diaInicio ? $request->diaInicio : '';
+            $hospitalizacion->mesInicio = $request->mesInicio ? $request->mesInicio : '';
+            $hospitalizacion->anioInicio = $request->anioInicio ? $request->anioInicio : '';
+            $hospitalizacion->diaTermino = $request->diaTermino ? $request->diaTermino : null;
+            $hospitalizacion->mesTermino = $request->mesTermino ? $request->mesTermino : null;
+            $hospitalizacion->anioTermino = $request->anioTermino ? $request->anioTermino : null;
+            $hospitalizacion->intervencion = $request->intervencion ? $request->intervencion : '';
+            $hospitalizacion->otros = $request->otros ? $request->otros : '';
+            $hospitalizacion->accion_tomada = $request->accionTomada ? $request->accionTomada : '';
+            $hospitalizacion->opcion_duplicidad = !$request->opcion_duplicidad ? null : $request->opcion_duplicidad;
+            $hospitalizacion->opcion_intervencion = !$request->opcion_intervencion ? null : $request->opcion_intervencion;
+            $hospitalizacion->opcion_aceptacion = !$request->opcion_aceptacion ? null : $request->opcion_aceptacion;
+            $hospitalizacion->opcion_sin_cambios = !$request->opcion_sin_cambios ? null : $request->opcion_sin_cambios;
+
+
+            if ($hospitalizacion->save()) {
+                return 1;
+            } else {
+                return 0;
+            }
+        } catch (\Throwable $th) {
+            return $th;
+        }
+    }
     public function cambios($paciente_id)
     {
         //Seccion de los
         $paciente = Pacientes::find($paciente_id);
-        $ingresos = Ingresos::where('paciente_id','=',$paciente_id)->first();
-        $signos = SignosVitales::where('paciente_id','=',$paciente_id)->first();
-        $tratamiento = Tratatamiento::where("paciente_id","=",$paciente_id)->first();
+        $ingresos = Ingresos::where('paciente_id', '=', $paciente_id)->first();
+        $signos = SignosVitales::where('paciente_id', '=', $paciente_id)->first();
+        $tratamiento = Tratatamiento::where("paciente_id", "=", $paciente_id)->first();
         $enfermedades = CatalogoEnfermedadesCronicas::all();
         $servicios = CatalogoServicios::all();
         $camas = CatalogoCamas::all();
         $medicos = CatalogoMedicos::all();
         $vias = CatalogoViaAdministracion::all();
-        return view("cambios",compact("paciente","signos","tratamiento","enfermedades","servicios","camas","medicos","vias","ingresos"));
-    }    
-    public function actualizacionCambios(Request $request){
+        return view("cambios", compact("paciente", "signos", "tratamiento", "enfermedades", "servicios", "camas", "medicos", "vias", "ingresos"));
+    }
+    public function actualizacionCambios(Request $request)
+    {
         $ingreso = Ingresos::find($request->paciente_id);
         $ingreso->id_servicio = $request->servicio;
         $ingreso->id_cama = $request->cama;
         if ($ingreso->save()) {
             return redirect()->route('enHospital')->with('success', 'Datos actualizados correctamente');
         } else {
-
         }
     }
     public function datosPaciente($paciente_id)
     {
         //Seccion de los
         $paciente = Pacientes::find($paciente_id);
-        $enfermedades = CatalogoEnfermedadesCronicas::where("id","=",$paciente->id_enfermedad_cronica)->first();
-        return view("datosPaciente",compact("paciente","enfermedades"));
-    }  
+        $enfermedades = CatalogoEnfermedadesCronicas::where("id", "=", $paciente->id_enfermedad_cronica)->first();
+        return view("datosPaciente", compact("paciente", "enfermedades"));
+    }
+    public function exportar()
+    {
+        return view("reportes");
+    }
+    public function exportarPacientes()
+    {
+        return Excel::download(new PacientesExport, 'Pacientes.xlsx');
+    }
+    public function exportarIngresos()
+    {
+        return Excel::download(new IngresosExport, 'Ingresos.xlsx');
+    }
+    public function exportarSignos()
+    {
+        return Excel::download(new SignosExport, 'Signos.xlsx');
+    }
+    public function exportarTratamiento()
+    {
+        return Excel::download(new TratamientoExport, 'Tratamientoes.xlsx');
+    }
+    public function exportarHospitalizacion()
+    {
+        return Excel::download(new HospitalizacionExport, 'Hospitalizaciones.xlsx');
+    }
 }

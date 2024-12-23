@@ -1,6 +1,9 @@
 @extends('layouts.plantilla')
 
 @section('content')
+<div class="row text-center">
+    <h3>SEGUIMIENTO FARMACOTERAPÉUTICO</h3>
+</div>
     <div class="container mt-3">
         <div class="accordion" id="accordionPanelsStayOpenExample">
             <form action="/registrarSeguimiento" method="POST" class="mt-3 container">
@@ -18,13 +21,32 @@
                         <div class="card">
                             <div class="card-body">
                                 <!-- Nombre completo -->
-                                <div class="form-group">
-                                    <label for="nombre">Nombre completo:</label>
-                                    <input type="text" name="nombre" id="nombre" class="form-control" required>
-                                    @error('nombre')
-                                        <div class="alert alert-danger">{{ $message }}</div>
-                                    @enderror
+                                <div class="row">
+                                    <div class="col-12 col-md-6">
+                                        <div class="form-group">
+                                            <label for="nombre">Nombre completo:</label>
+                                            <input type="text" name="nombre" id="nombre" class="form-control" required value="{{ old('nombre')}}">
+                                            @error('nombre')
+                                                <div class="alert alert-danger">{{ $message }}</div>
+                                            @enderror
+                                        </div>
+                                    </div>
+                                    <div class="col-12 col-md-6">
+                                        <div class="form-group">
+                                                <label for="id">  Id:</label>
+                                                <input type="text" id="id" name="id" class="form-control"
+                                                    readonly value="{{$id}}">
+                                                @error('id')
+                                                    <div class="alert alert-danger">{{ $message }}</div>
+                                                @enderror
+                                        </div>
+                                    </div>
                                 </div>
+                                @php
+                                    $mesActual = date("n");
+                                    $diaActual = date("j");
+                                    $añoActual = date("Y");
+                                @endphp
                                 <div class="row p-2">
                                     <div class="col-12 col-md-8">
                                         <div class="row justify-content-md-center">
@@ -34,17 +56,24 @@
                                             <div class="d-flex">
                                                 <select name="fecha_nac_dia" id="fecha_nac_dia" class="form-control col-2"
                                                     style="width: 25%;">
+                                                    <option value="" disabled {{ old('fecha_nac_dia') ? '' : 'selected' }}>Selecciona una opción...</option>
                                                     @for ($i = 1; $i <= 31; $i++)
-                                                        <option value="{{ $i }}">{{ $i }}</option>
+                                                    <option value="{{ $i }}" {{ $i == ($diaActual ) ? 'selected' : '' }}>
+                                                        {{ $i }}
+                                                    </option>
                                                     @endfor
                                                 </select>
                                                 @error('fecha_nac_dia')
                                                     <div class="alert alert-danger">{{ $message }}</div>
                                                 @enderror
-                                                <select name="fecha_nac_mes" id="fecha_nac_mes" class="form-control mx-2"
-                                                    style="width: 40%;">
+                                                
+                                                <select name="fecha_nac_mes" id="fecha_nac_mes" class="form-control mx-2" style="width: 40%;">
+                                                    <option value="" disabled {{ old('fecha_nac_mes') ? '' : 'selected' }}>Selecciona una opción...</option>
                                                     @foreach (['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'] as $index => $mes)
-                                                        <option value="{{ $index + 1 }}">{{ $mes }}</option>
+                                                        <option value="{{ $index + 1 }}" 
+                                                                    {{ ($index + 1) == $mesActual ? 'selected' : '' }}>
+                                                            {{ $mes }}
+                                                        </option>
                                                     @endforeach
                                                 </select>
                                                 @error('fecha_nac_mes')
@@ -52,8 +81,10 @@
                                                 @enderror
                                                 <select name="fecha_nac_año" id="fecha_nac_año" class="form-control"
                                                     style="width: 35%;" onchange="calculaEdad()">
-                                                    @for ($i = date('Y'); $i >= 1900; $i--)
-                                                        <option value="{{ $i }}">{{ $i }}</option>
+                                                    @for ($i = date('Y') + 10; $i >= 1900; $i--)
+                                                    <option value="{{ $i }}" {{ $i == $añoActual ? 'selected' : '' }}>
+                                                        {{ $i }}
+                                                    </option>
                                                     @endfor
                                                 </select>
                                                 @error('fecha_nac_año')
@@ -61,7 +92,6 @@
                                                 @enderror
                                             </div>
                                         </div>
-
                                     </div>
                                     <div class="col-12 col-md-4">
                                         <div class="row">
@@ -70,7 +100,7 @@
                                             </div>
                                             <div class="col-9 mt-1">
                                                 <input type="text" id="edad" name="edad" class="form-control"
-                                                    readonly>
+                                                    readonly value="{{ old('edad')}}">
                                                 @error('edad')
                                                     <div class="alert alert-danger">{{ $message }}</div>
                                                 @enderror
@@ -87,10 +117,11 @@
                                                 <label>Género:</label>
                                             </div>
                                             <div class="col">
-                                                <input type="radio" name="genero" value="Hombre" id="hombre">
+                                                <input type="radio" name="genero" value="Hombre" id="hombre" 
+                                                {{ old('genero') == 'Hombre' ? 'checked' : '' }}>
                                                 <label for="hombre">Hombre</label>
                                                 <input type="radio" name="genero" value="Mujer" id="mujer"
-                                                    class="ml-2">
+                                                    class="ml-2" {{ old('genero') == 'Mujer' ? 'checked' : '' }}>
                                                 <label for="mujer">Mujer</label>
                                                 @error('genero')
                                                     <div class="alert alert-danger">{{ $message }}</div>
@@ -106,8 +137,7 @@
                                             <div class="col">
                                                 <select class="form-select" id="enfermedades_cronicas"
                                                     name="enfermedades_cronicas">
-                                                    <option value="" selected disabled>Selecciona una opcion...
-                                                    </option>
+                                                    <option value="" disabled {{ old('enfermedades_cronicas') ? '' : 'selected' }}>Selecciona una opción...</option>
                                                     @foreach ($enfermedades as $enfermedad)
                                                         <option value="{{ $enfermedad->id }}">
                                                             {{ $enfermedad->enfermedad }}</option>
@@ -127,8 +157,8 @@
                                                 <label for="telefono">Número telefónico:</label>
                                             </div>
                                             <div class="col mt-1">
-                                                <input type="text" name="telefono" id="telefono" class="form-control"
-                                                    required>
+                                                <input type="number" name="telefono" id="telefono" class="form-control"
+                                                    required value="{{old('telefono')}}" min="1111111111">
                                                 @error('telefono')
                                                     <div class="alert alert-danger">{{ $message }}</div>
                                                 @enderror
@@ -141,7 +171,7 @@
                                                 <label for="alergias">Alergias:</label>
                                             </div>
                                             <div class="col mt-1">
-                                                <textarea name="alergias" id="alergias" class="form-control"></textarea>
+                                                <input name="alergias" id="alergias" class="form-control" value="{{old('alergias')}}">
                                                 @error('alergias')
                                                     <div class="alert alert-danger">{{ $message }}</div>
                                                 @enderror
@@ -172,7 +202,7 @@
                                     <div class="d-flex">
                                         <select name="dia" id="dia" class="form-control" style="width: 25%;">
                                             @for ($i = 1; $i <= 31; $i++)
-                                                <option value="{{ $i }}">{{ $i }}</option>
+                                                <option value="{{ $i }}" value="{{ $i }}" {{ $i == ($diaActual ) ? 'selected' : '' }}>{{ $i }}</option>
                                             @endfor
                                         </select>
                                         @error('dia')
@@ -181,15 +211,15 @@
                                         <select name="mes" id="mes" class="form-control mx-2"
                                             style="width: 40%;">
                                             @foreach (['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'] as $index => $mes)
-                                                <option value="{{ $index + 1 }}">{{ $mes }}</option>
+                                                <option value="{{ $index + 1 }}"  {{ ($index + 1) == $mesActual ? 'selected' : '' }}>{{ $mes }}</option>
                                             @endforeach
                                         </select>
                                         @error('mes')
                                             <div class="alert alert-danger">{{ $message }}</div>
                                         @enderror
                                         <select name="anio" id="anio" class="form-control" style="width: 35%;">
-                                            @for ($i = date('Y'); $i >= 1900; $i--)
-                                                <option value="{{ $i }}">{{ $i }}</option>
+                                            @for ($i = date('Y') + 10; $i >= 1900; $i--)
+                                                <option value="{{ $i }}"  {{ $i == $añoActual ? 'selected' : '' }}>{{ $i }}</option>
                                             @endfor
                                         </select>
                                         @error('anio')
@@ -202,7 +232,7 @@
                                 <div class="form-group">
                                     <label for="hora_ingreso">Hora de Ingreso:</label>
                                     <input type="time" name="hora_ingreso" id="hora_ingreso" class="form-control"
-                                        value="{{ date('H:i') }}">
+                                        value="{{ old('hora_ingreso', date('H:i')) }}">
                                     @error('hora_ingreso')
                                         <div class="alert alert-danger">{{ $message }}</div>
                                     @enderror
@@ -212,7 +242,7 @@
                                         <!-- Diagnóstico de Ingreso -->
                                         <div class="form-group">
                                             <label for="diagnostico_ingreso">Diagnóstico de Ingreso:</label>
-                                            <textarea name="diagnostico_ingreso" id="diagnostico_ingreso" class="form-control" rows="3"></textarea>
+                                            <input name="diagnostico_ingreso" id="diagnostico_ingreso" class="form-control" rows="3" value="{{old('diagnostico_ingreso')}}">
                                             @error('diagnostico_ingreso')
                                                 <div class="alert alert-danger">{{ $message }}</div>
                                             @enderror
@@ -224,8 +254,7 @@
                                             <div class="form-group">
                                                 <label for="servicio">Servicio:</label>
                                                 <select class="form-select" id="servicio" name="servicio">
-                                                    <option value="" selected disabled>Selecciona un servicio...
-                                                    </option>
+                                                    <option value="" disabled {{ old('servicio') ? '' : 'selected' }}>Selecciona un Servicio...</option>
                                                     @foreach ($servicios as $servicio)
                                                         <option value="{{ $servicio->id }}">{{ $servicio->servicio }}
                                                         </option>
@@ -242,10 +271,11 @@
                                             <div class="form-group">
                                                 <label for="cama">Cama:</label>
                                                 <select class="form-select" id="cama" name="cama">
-                                                    <option value="" selected disabled>Selecciona una via de
-                                                        administración...</option>
+                                                    <option value="" disabled {{ old('cama') ? '' : 'selected' }}>Selecciona una cama...</option>
                                                     @foreach ($camas as $cama)
-                                                        <option value="{{ $cama->id }}">{{ $cama->cama }}</option>
+                                                        <option value="{{ $cama->id }}" {{ old('cama') == $cama->id ? 'selected' : '' }}>
+                                                            {{ $cama->cama }}
+                                                        </option>
                                                     @endforeach
                                                 </select>
                                                 @error('cama')
@@ -277,7 +307,7 @@
                                     <div class="col-md-6 form-group">
                                         <label for="frecuencia_cardiaca">Frecuencia Cardíaca:</label>
                                         <input type="number" name="frecuencia_cardiaca" id="frecuencia_cardiaca"
-                                            class="form-control" placeholder="Latidos por minuto">
+                                            class="form-control" placeholder="Latidos por minuto" value="{{old('frecuencia_cardiaca')}}">
                                         @error('frecuencia_cardiaca')
                                             <div class="alert alert-danger">{{ $message }}</div>
                                         @enderror
@@ -287,7 +317,7 @@
                                     <div class="col-md-6 form-group">
                                         <label for="tension_arterial">Tensión Arterial:</label>
                                         <input type="text" name="tension_arterial" id="tension_arterial"
-                                            class="form-control" placeholder="Ejemplo: 120/80">
+                                            class="form-control" placeholder="Ejemplo: 120/80" value="{{old('tension_arterial')}}">
                                         @error('tension_arterial')
                                             <div class="alert alert-danger">{{ $message }}</div>
                                         @enderror
@@ -297,7 +327,7 @@
                                     <div class="col-md-6 form-group">
                                         <label for="pulso">Pulso:</label>
                                         <input type="number" name="pulso" id="pulso" class="form-control"
-                                            placeholder="Pulsaciones por minuto">
+                                            placeholder="Pulsaciones por minuto" value="{{old('pulso')}}">
                                         @error('pulso')
                                             <div class="alert alert-danger">{{ $message }}</div>
                                         @enderror
@@ -307,7 +337,7 @@
                                     <div class="col-md-6 form-group">
                                         <label for="temperatura">Temperatura:</label>
                                         <input type="number" name="temperatura" id="temperatura" class="form-control"
-                                            placeholder="En grados Celsius">
+                                            placeholder="En grados Celsius" value="{{old('temperatura')}}">
                                         @error('temperatura')
                                             <div class="alert alert-danger">{{ $message }}</div>
                                         @enderror
@@ -317,7 +347,7 @@
                                     <div class="col-md-6 form-group">
                                         <label for="frecuencia_respiratoria">Frecuencia Respiratoria:</label>
                                         <input type="number" name="frecuencia_respiratoria" id="frecuencia_respiratoria"
-                                            class="form-control" placeholder="Respiraciones por minuto">
+                                            class="form-control" placeholder="Respiraciones por minuto" value="{{old('frecuencia_respiratoria')}}">
                                         @error('frecuencia_respiratoria')
                                             <div class="alert alert-danger">{{ $message }}</div>
                                         @enderror
@@ -327,7 +357,7 @@
                                     <div class="col-md-6 form-group">
                                         <label for="oxigenacion">Oxigenación:</label>
                                         <input type="number" name="oxigenacion" id="oxigenacion" class="form-control"
-                                            placeholder="Porcentaje de oxígeno">
+                                            placeholder="Porcentaje de oxígeno" value="{{old('oxigenacion')}}">
                                         @error('oxigenacion')
                                             <div class="alert alert-danger">{{ $message }}</div>
                                         @enderror
@@ -337,7 +367,7 @@
                                     <div class="col-md-6 form-group">
                                         <label for="peso">Peso:</label>
                                         <input type="number" name="peso" id="peso" class="form-control"
-                                            placeholder="En kilogramos">
+                                            placeholder="En kilogramos" value="{{old('peso')}}">
                                         @error('peso')
                                             <div class="alert alert-danger">{{ $message }}</div>
                                         @enderror
@@ -347,7 +377,7 @@
                                     <div class="col-md-6 form-group">
                                         <label for="talla">Talla:</label>
                                         <input type="number" name="talla" id="talla" class="form-control"
-                                            placeholder="En centímetros">
+                                            placeholder="En centímetros" value="{{old('talla')}}">
                                         @error('talla')
                                             <div class="alert alert-danger">{{ $message }}</div>
                                         @enderror
@@ -392,7 +422,7 @@
             let fecha = new Date()
             let edad = (fecha.getFullYear() - año);
             $("#edad").val(edad);
-
+            $("#dia").val(fecha.getDate())
         }
     </script>
 @endsection
