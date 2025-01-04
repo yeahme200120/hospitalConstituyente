@@ -55,10 +55,6 @@
                     toastr.error("{{ $error }}");
                 @endforeach
             @endif
-
-            @if (session('success'))
-                toastr.success("{{ session('success') }}");
-            @endif
         });
 
         function calculaEdad() {

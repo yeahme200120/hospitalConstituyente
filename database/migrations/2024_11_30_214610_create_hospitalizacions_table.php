@@ -37,6 +37,7 @@ return new class extends Migration
             $table->string("recomendacion");
             $table->string("otros");
             $table->string("accion_tomada");
+            $table->integer("estatus");
             $table->timestamps();
         });
     }

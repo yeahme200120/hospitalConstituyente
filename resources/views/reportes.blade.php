@@ -2,19 +2,32 @@
 
 @section('content')
     <div class="container mt-3">
+        <form action="exportToExcelFiltrado" method="POST">
+            @csrf
         <div class="row m-2 p-2 btn-secundario justify-content-center">
             <div class="col-5 col-md-3 text-center">
                 Exportar reportes
             </div>
         </div>
-        <div class="row mt-5 justify-content-md-center">
-            <div class="col-12 col-md-2 btn-secundario p-2 m-2 text-center"><a href="/exportDinamica/Pacientes" class="text-center text-white">Pacientes</a></div>
-            <div class="col-12 col-md-2 btn-secundario p-2 m-2 text-center"><a href="/exportDinamica/Ingresos" class="text-center text-white">Ingresos</a></div>
-            <div class="col-12 col-md-2 btn-secundario p-2 m-2 text-center"><a href="/exportDinamica/Signos" class="text-center text-white">Signos Vitales</a></div>
-            <div class="col-12 col-md-2 btn-secundario p-2 m-2 text-center"><a href="/exportDinamica/Tratamientos" class="text-center text-white">Tratamientos </a></div>
-            <div class="col-12 col-md-2 btn-secundario p-2 m-2 text-center"><a href="/exportDinamica/Hospitalizaciones" class="text-center text-white">Hospitalizaciones </a></div>
-            
+        <div class="row">
+            <div class="col-12 col-md-6">
+                <label for="">Fecha</label>
+                <input type="date" name="fecha" class="form-control">
+            </div>
+            <div class="col-12 col-md-6">
+                <label for="">Paciente</label>
+                <select name="paciente" id="paciente" class="form-control">
+                    @foreach ($pacientes as $p)
+                    <option value="{{$p->id}}">{{$p->nombre}}</option>
+                    @endforeach
+                </select>
+            </div>
         </div>
+        <div class="row mt-5 justify-content-md-center">
+            <div class="col-12 col-md-2 btn-secundario p-2 m-2 text-center"><a href="/exportDinamica/PACIENTE-INGRESO" class="text-center text-white">PACIENTE-INGRESO</a></div>
+            <div class="col-12 col-md-2 btn-secundario p-2 m-2 text-center"><button type="submit" style="background-color: transparent; border:none;" class="text-center text-white">REPORTE SERVICIO</button></div>    
+        </div>
+    </form>
     </div>
     <script>
         @if (session('success'))
@@ -24,6 +37,11 @@
         @if (session('error'))
             toastr.error('{{ session('error') }}');
         @endif
+         function enviarFiltros(){
+            let fecha = $("#fecha").val();
+            let paciente = $('#paciente').val();
+            console.log(fecha, paciente);
+        }
     </script>
     <script>
         $(document).ready(function() {

@@ -30,4 +30,7 @@ Route::get('/exportarSignos', [App\Http\Controllers\HomeController::class, 'expo
 Route::get('/exportarTratamiento', [App\Http\Controllers\HomeController::class, 'exportarTratamiento'])->name('exportarTratamiento');
 Route::get('/exportarHospitalizacion', [App\Http\Controllers\HomeController::class, 'exportarHospitalizacion'])->name('exportarHospitalizacion');
 Route::get('/exportDinamica/{tipo}', [ExportacionesController::class, 'exportToExcel'])->name('exportToExcel');
+Route::get('/salidaHospitalizacion/{id}', [App\Http\Controllers\HomeController::class, 'salidaHospitalizacion'])->name('salidaHospitalizacion');
+Route::post('/exportToExcelFiltrado', [ExportacionesController::class, 'exportToExcelFiltrado'])->name('exportToExcelFiltrado');
+
 

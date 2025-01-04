@@ -394,7 +394,7 @@
                                     <button type="submit" class="btn btn-principal p-3">GUARDAR</button>
                                     <button type="button" class="btn btn-principal p-3"
                                         onclick="agregarMedicamento()">AGREGAR MEDICAMENTO</button>
-                                    <button type="button" class="btn btn-principal p-3">SALIDA PACIENTE</button>
+                                    <button type="button" class="btn btn-principal p-3" disabled>SALIDA PACIENTE</button>
                                 </div>
                             </div>
                         </div>
@@ -539,10 +539,6 @@
                 @foreach ($errors->all() as $error)
                     toastr.error("{{ $error }}");
                 @endforeach
-            @endif
-
-            @if (session('success'))
-                toastr.success("{{ session('success') }}");
             @endif
         });
     </script>

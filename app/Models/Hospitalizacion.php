@@ -30,6 +30,7 @@ class Hospitalizacion extends Model
         "contraindicaciones",
         "recomendacion",
         "otros",
-        "accion_tomada"
+        "accion_tomada",
+        "estatus"
     ];
 }

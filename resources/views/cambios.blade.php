@@ -6,6 +6,7 @@
             <form action="/actualizacionCambios" method="POST" class="mt-3 container">
                 @csrf
                 <input class="form-control" type="hidden" name="paciente_id" value="{{$paciente->id}}">
+                <input class="form-control" type="hidden" name="id" value="{{$hospitalizacion->id}}">
                 <div class="accordion-item">
                     <h2 class="accordion-header" id="panelsStayOpen-headingTwo">
                         <button class="accordion-button collapsed btn-secundario" type="button"
@@ -59,13 +60,12 @@
                                         <div class="row">
                                             <!-- Servicio -->
                                             <div class="form-group">
-                                                <p><b>Servicio actual: {{$ingresos->id_servicio}}</b></p>
                                                 <label for="servicio">Servicio:</label>
                                                 <select class="form-select" id="servicio" name="servicio" required>
                                                     <option value="" selected disabled>Selecciona un servicio...
                                                     </option>
                                                     @foreach ($servicios as $servicio)
-                                                        <option value="{{ $servicio->id }}">{{ $servicio->servicio }}
+                                                        <option value="{{ $servicio->id }}" @if($servicio->id == $ingresos->id_servicio) selected @endif>{{ $servicio->servicio }}
                                                         </option>
                                                     @endforeach
                                                 </select>
@@ -78,13 +78,12 @@
                                         <div class="row">
                                             <!-- Cama -->
                                             <div class="form-group">
-                                                <p><b>Cama actual: {{$ingresos->id_cama}}</b></p>
                                                 <label for="cama">Cama:</label>
                                                 <select class="form-select" id="cama" name="cama">
                                                     <option value="" selected disabled>Selecciona una via de
                                                         administración...</option>
                                                     @foreach ($camas as $cama)
-                                                        <option value="{{ $cama->id }}">{{ $cama->cama }}</option>
+                                                        <option value="{{ $cama->id }}" @if($cama->id == $ingresos->id_cama) selected @endif>{{ $cama->cama }}</option>
                                                     @endforeach
                                                 </select>
                                                 @error('cama')
@@ -230,6 +229,9 @@
                     </div>
                 </div>
                 <div class="row justify-content-end mt-3">
+                    <div class="col-2">
+                        <a href="/salidaHospitalizacion/{{$hospitalizacion->id}}" class="btn btn-principal" disabled>SALIDA PACIENTE</a>
+                    </div>
                     <div class="col-2">
                         <button type="submit" class="btn btn-principal" style="font-style: oblique;">Siguiente</button>
                     </div>

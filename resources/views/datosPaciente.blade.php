@@ -31,9 +31,9 @@
                                             <div class="d-flex">
                                                 <input type="text" name="nombre" id="nombre" class="form-control" readonly value="{{$paciente->fecha_nac_dia}}">
                                                 @php
-                                                    $meses=['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'] ;  
+                                                    $meses=['','Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'] ;  
                                                 @endphp
-                                                <input type="text" name="nombre" id="nombre" class="form-control" readonly value="{{ $meses[ $paciente->fecha_nac_dia + 1] }}">
+                                                <input type="text" name="nombre" id="nombre" class="form-control" readonly value="{{ $meses[ $paciente->fecha_nac_mes] }}">
                                                 <input type="text" name="nombre" id="nombre" class="form-control" readonly value="{{$paciente->fecha_nac_año}}">
                                             </div>
                                         </div>
