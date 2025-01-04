@@ -70,7 +70,15 @@
                                                 <label for="enfermedades_cronicas">Enfermedades crónicas:</label>
                                             </div>
                                             <div class="col">
-                                                <input type="text" name="nombre" id="nombre" class="form-control" value="{{$enfermedades->enfermedad}}" readonly>
+                                                <label for="">
+                                                    <ul>
+                                                        @foreach ($enfermedades as $en )
+                                                        <li>
+                                                            {{$en->enfermedad}}
+                                                        </li>
+                                                        @endforeach
+                                                    </ul>        
+                                            </label>
                                             </div>
                                         </div>
                                     </div>

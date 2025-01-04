@@ -129,7 +129,7 @@ class HomeController extends Controller
         $paciente->fecha_nac_año = $request->fecha_nac_año;
         $paciente->edad = $request->edad;
         $paciente->genero = $request->genero;
-        $paciente->id_enfermedad_cronica = $request->enfermedades_cronicas;
+        $paciente->id_enfermedad_cronica = json_encode($request->enfermedades_cronicas);
         $paciente->telefono = $request->telefono;
         $paciente->alergias = $request->alergias;
 
@@ -370,13 +370,18 @@ class HomeController extends Controller
     public function datosPaciente($paciente_id)
     {
         $paciente = Pacientes::find($paciente_id);
+        $enfermedades =[];
         if(!$paciente){
             return redirect()->route('errorPage')->with('error', 'Paciente no encontrado');
         }else{
+            $datos = json_decode($paciente->id_enfermedad_cronica);
             if(!$paciente->id_enfermedad_cronica || $paciente->id_enfermedad_cronica == null || $paciente->id_enfermedad_cronica = ''){
                 $enfermedades = CatalogoEnfermedadesCronicas::all();
             }else{
-                $enfermedades = CatalogoEnfermedadesCronicas::where("id", "=", $paciente->id_enfermedad_cronica)->first();
+                foreach($datos as $enf){
+                    array_push($enfermedades,CatalogoEnfermedadesCronicas::where("id", "=", $enf)->first());
+                };
+                //$enfermedades = CatalogoEnfermedadesCronicas::where("id", "=", $paciente->id_enfermedad_cronica)->first();
             }
             return view("datosPaciente", compact("paciente", "enfermedades"));
         }
@@ -392,8 +397,7 @@ class HomeController extends Controller
     }
     public function exportar()
     {
-        $pacientes = Pacientes::all();
-        return view("reportes",compact("pacientes"));
+        return view("reportes");
     }
     public function exportarPacientes()
     {

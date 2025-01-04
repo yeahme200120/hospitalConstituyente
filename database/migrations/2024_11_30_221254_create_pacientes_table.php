@@ -19,7 +19,7 @@ return new class extends Migration
             $table->bigInteger("fecha_nac_año");
             $table->integer("edad");
             $table->string("genero");
-            $table->integer("id_enfermedad_cronica");
+            $table->string("id_enfermedad_cronica");
             $table->string("telefono");
             $table->string("alergias");
             $table->timestamps();

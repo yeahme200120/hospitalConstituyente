@@ -98,7 +98,6 @@ class ExportacionesController extends Controller
                         ->join("catalogo_camas as camas","camas.id","=","ingresos.id_cama")
                         ->join("catalogo_enfermedades_cronicas as enfermedades","enfermedades.id","=","pa.id_enfermedad_cronica")
                         ->get();
-                        $datos[0]->created_at = Carbon::parse($datos[0]->created_at)->format('d-m-Y');
                 break;
             case 'REPORTE SERVICIO':
                 $headers = [
@@ -167,68 +166,71 @@ class ExportacionesController extends Controller
     }
     public function exportToExcelFiltrado(Request $request)
     {
-        // Crea un nuevo archivo Excel
-        $spreadsheet = new Spreadsheet();
-        $sheet = $spreadsheet->getActiveSheet();
-        // Define las cabeceras segun el tipo
-        $tipo = "REPORTE SERVICIO";
-        $headers = [
-            "paciente_id",
-            "medicamento",
-            "dosis_max",
-            "dosis_administrada",
-            "id_via_administracion",
-            "opcion_duplicidad",
-            "opcion_intervencion",
-            "opcion_aceptacion",
-            "opcion_sin_cambios",
-            "intervalo",
-            "servicio",
-            "horario",
-            "diaInicio",
-            "mesInicio",
-            "anioInicio",
-            "diaTermino",
-            "mesTermino",
-            "anioTermino",
-            "intervencion",
-            "interacciones",
-            "contraindicaciones",
-            "recomendacion",
-            "otros",
-            "accion_tomada",
-            "estatus"
+        $rules = [
+            'fecha' => 'required',
+            'fecha_fin' => 'required',
         ];
-        $sheet->fromArray($headers, null, 'A1'); // Inserta las cabeceras en la primera fila
-        // Recupera los datos
-        if($request->fecha){
-            if($request->paciente){
-                $datosF = Hospitalizacion::where("paciente_id","=",$request->paciente)->where("created_at","=",$request->fecha)->orderBy('created_at', 'DESC')->get();
-            }else{
-                $datosF = Hospitalizacion::where("created_at","=",$request->fecha)->orderBy('created_at', 'DESC')->get();
-            }
-        }else{
-            if($request->paciente){
-                $datosF = Hospitalizacion::where("paciente_id","=",$request->paciente)->orderBy('created_at', 'DESC')->get();
-            }else{
-                $datosF = Hospitalizacion::all();
-            }
-        };
 
-        $datos = $datosF;
-        // Agrega los datos al archivo Excel
-        $data = $datos->toArray(); // Convierte los datos en un array
-        $sheet->fromArray($data, null, 'A2'); // Inserta los datos desde la segunda fila
-
-        // Crea el archivo Excel
-        $fileName = $tipo . '.xlsx';
-        $writer = new Xlsx($spreadsheet);
-
-        // Guarda el archivo en el servidor temporalmente
-        $tempFile = tempnam(sys_get_temp_dir(), $fileName);
-        $writer->save($tempFile);
-
-        // Descarga el archivo
-        return Response::download($tempFile, $fileName)->deleteFileAfterSend(true);
+        $messages = [
+            'fecha.required' => 'El campo de la fecha de inicio es un campo requerido.',
+            'fecha_fin.required' => 'El campo de la fecha fin es un campo requerido.',
+        ];
+        $respuesta = [];
+        $this->validate($request, $rules, $messages);
+        // Crea un nuevo archivo Excel
+        try {
+            $spreadsheet = new Spreadsheet();
+            $sheet = $spreadsheet->getActiveSheet();
+            // Define las cabeceras segun el tipo
+            $tipo = "REPORTE SERVICIO";
+            $headers = [
+                "paciente_id",
+                "medicamento",
+                "dosis_max",
+                "dosis_administrada",
+                "id_via_administracion",
+                "opcion_duplicidad",
+                "opcion_intervencion",
+                "opcion_aceptacion",
+                "opcion_sin_cambios",
+                "intervalo",
+                "servicio",
+                "horario",
+                "diaInicio",
+                "mesInicio",
+                "anioInicio",
+                "diaTermino",
+                "mesTermino",
+                "anioTermino",
+                "intervencion",
+                "interacciones",
+                "contraindicaciones",
+                "recomendacion",
+                "otros",
+                "accion_tomada",
+                "estatus"
+            ];
+            $sheet->fromArray($headers, null, 'A1'); // Inserta las cabeceras en la primera fila
+            // Recupera los datos
+            $datosF = Hospitalizacion::where("created_at",">",$request->fecha)->where("created_at","<",$request->fecha_fin)->orderBy('created_at', 'DESC')->get();
+    
+            $datos = $datosF;
+            // Agrega los datos al archivo Excel
+            $data = $datos->toArray(); // Convierte los datos en un array
+            $sheet->fromArray($data, null, 'A2'); // Inserta los datos desde la segunda fila
+    
+            // Crea el archivo Excel
+            $fileName = $tipo . '.xlsx';
+            $writer = new Xlsx($spreadsheet);
+    
+            // Guarda el archivo en el servidor temporalmente
+            $tempFile = tempnam(sys_get_temp_dir(), $fileName);
+            $writer->save($tempFile);
+    
+            // Descarga el archivo
+            return Response::download($tempFile, $fileName)->deleteFileAfterSend(true);
+        } catch (\Throwable $th) {
+            dd($th);
+        }
     }
 }

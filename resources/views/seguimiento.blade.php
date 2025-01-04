@@ -135,8 +135,8 @@
                                                 <label for="enfermedades_cronicas">Enfermedades crónicas:</label>
                                             </div>
                                             <div class="col">
-                                                <select class="form-select" id="enfermedades_cronicas"
-                                                    name="enfermedades_cronicas">
+                                                <select class="form-select select2" id="enfermedades_cronicas"
+                                                    name="enfermedades_cronicas[]" multiple="multiple">
                                                     <option value="" disabled {{ old('enfermedades_cronicas') ? '' : 'selected' }}>Selecciona una opción...</option>
                                                     @foreach ($enfermedades as $enfermedad)
                                                         <option value="{{ $enfermedad->id }}">
@@ -406,6 +406,7 @@
     </script>
     <script>
         $(document).ready(function() {
+            $('.select2').select2();    
             @if ($errors->any())
                 @foreach ($errors->all() as $error)
                     toastr.error("{{ $error }}");

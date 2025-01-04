@@ -11,16 +11,12 @@
         </div>
         <div class="row">
             <div class="col-12 col-md-6">
-                <label for="">Fecha</label>
+                <label for="">Fecha Inicio</label>
                 <input type="date" name="fecha" class="form-control">
             </div>
             <div class="col-12 col-md-6">
-                <label for="">Paciente</label>
-                <select name="paciente" id="paciente" class="form-control">
-                    @foreach ($pacientes as $p)
-                    <option value="{{$p->id}}">{{$p->nombre}}</option>
-                    @endforeach
-                </select>
+                <label for="">Fecha Fin</label>
+                <input type="date" name="fecha_fin" id="fecha_fin" class="form-control">
             </div>
         </div>
         <div class="row mt-5 justify-content-md-center">
