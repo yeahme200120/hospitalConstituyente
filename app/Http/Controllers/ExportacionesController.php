@@ -212,7 +212,9 @@ class ExportacionesController extends Controller
             ];
             $sheet->fromArray($headers, null, 'A1'); // Inserta las cabeceras en la primera fila
             // Recupera los datos
-            $datosF = Hospitalizacion::where("created_at",">",$request->fecha)->where("created_at","<",$request->fecha_fin)->orderBy('created_at', 'DESC')->get();
+            $startDate = Carbon::parse($request->fecha)->startOfDay();
+            $endDate = Carbon::parse($request->fecha_fin)->endOfDay();
+            $datosF = Hospitalizacion::where("created_at",[$startDate, $endDate])->orderBy('created_at', 'DESC')->get();
     
             $datos = $datosF;
             // Agrega los datos al archivo Excel
