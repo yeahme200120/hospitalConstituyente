@@ -214,8 +214,8 @@ class ExportacionesController extends Controller
             // Recupera los datos
             $startDate = Carbon::parse($request->fecha)->startOfDay();
             $endDate = Carbon::parse($request->fecha_fin)->endOfDay();
-            $datosF = Hospitalizacion::where("created_at",[$startDate, $endDate])->orderBy('created_at', 'DESC')->get();
-    
+            $datosF = Hospitalizacion::where("created_at",">=",$startDate)->where("created_at","<=",$endDate)->orderBy('created_at', 'DESC')->get();
+            
             $datos = $datosF;
             // Agrega los datos al archivo Excel
             $data = $datos->toArray(); // Convierte los datos en un array
