@@ -8,6 +8,7 @@
         <div class="accordion" id="accordionPanelsStayOpenExample">
             <form action="/registrarSeguimiento" method="POST" class="mt-3 container">
                 @csrf
+
                 <div class="accordion-item">
                     <h2 class="accordion-header " id="panelsStayOpen-headingOne">
                         <button class="accordion-button btn-secundario" type="button" data-bs-toggle="collapse"
@@ -20,6 +21,19 @@
                         aria-labelledby="panelsStayOpen-headingOne">
                         <div class="card">
                             <div class="card-body">
+                                <div class="row">
+                                    <div class="col-12 col-md-6">
+                                        <div class="form-group">
+                                            <label for="nombre">Paciente:</label>
+                                            <select class="form-control select2" name="pacientesSelect" id="pacientesSelect" onchange="llenarDatos()">
+                                                <option value="" disabled selected>Nuevo registró</option>
+                                                @foreach ($pacientes as $paciente)
+                                                    <option value="{{$paciente}}">{{$paciente->nombre}}</option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
                                 <!-- Nombre completo -->
                                 <div class="row">
                                     <div class="col-12 col-md-6">
@@ -323,16 +337,6 @@
                                         @enderror
                                     </div>
 
-                                    <!-- Pulso -->
-                                    <div class="col-md-6 form-group">
-                                        <label for="pulso">Pulso:</label>
-                                        <input type="number" name="pulso" id="pulso" class="form-control"
-                                            placeholder="Pulsaciones por minuto" value="{{old('pulso')}}">
-                                        @error('pulso')
-                                            <div class="alert alert-danger">{{ $message }}</div>
-                                        @enderror
-                                    </div>
-
                                     <!-- Temperatura -->
                                     <div class="col-md-6 form-group">
                                         <label for="temperatura">Temperatura:</label>
@@ -425,5 +429,19 @@
             $("#edad").val(edad);
             $("#dia").val(fecha.getDate())
         }
+        function llenarDatos() {
+        const selectedValue = $('#pacientesSelect').val();  
+        let paciente = JSON.parse(selectedValue);
+        let nombre = $("#nombre").val(paciente.nombre);
+        let fecha_nac_dia = $("#fecha_nac_dia").val(paciente.fecha_nac_dia);
+        let fecha_nac_mes = $("#fecha_nac_mes").val(paciente.fecha_nac_mes);
+        let fecha_nac_año = $("#fecha_nac_año").val(paciente.fecha_nac_año);
+        let edad = $("#edad").val(paciente.edad);    
+        let genero = $("#genero").val(paciente.genero);
+        let enfermedades_cronicas = $("#enfermedades_cronicas").val(paciente.enfermedades_cronicas);
+        let telefono = $("#telefono").val(paciente.telefono);
+        let alergias = $("#alergias").val(paciente.alergias);
+        let id = $("#id").val(paciente.id_paciente);
+    }
     </script>
 @endsection

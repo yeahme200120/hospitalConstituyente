@@ -23,7 +23,6 @@ return new class extends Migration
             $table->string("opcion_aceptacion")->nullable();
             $table->string("opcion_sin_cambios")->nullable();
             $table->string("intervalo");
-            $table->string("servicio");
             $table->time("horario");
             $table->bigInteger("diaInicio");
             $table->string("mesInicio");

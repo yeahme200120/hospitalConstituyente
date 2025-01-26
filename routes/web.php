@@ -22,7 +22,7 @@ Route::get('/seguimientoTratamiento', [App\Http\Controllers\HomeController::clas
 Route::get('/seguimientoTratamientoId/{paciente}', [App\Http\Controllers\HomeController::class, 'seguimientoTratamientoId'])->name('seguimientoTratamiento');
 Route::get('/cambios/{paciente}', [App\Http\Controllers\HomeController::class, 'cambios'])->name('cambios');
 Route::post('/actualizacionCambios', [App\Http\Controllers\HomeController::class, 'actualizacionCambios'])->name('actualizacionCambios');
-Route::get('/datosPaciente/{paciente}', [App\Http\Controllers\HomeController::class, 'datosPaciente'])->name('datosPaciente');
+Route::get('/datosPaciente/{paciente}/{hospital}', [App\Http\Controllers\HomeController::class, 'datosPaciente'])->name('datosPaciente');
 Route::get('/exportar', [App\Http\Controllers\HomeController::class, 'exportar'])->name('exportar');
 Route::get('/exportarPacientes', [App\Http\Controllers\HomeController::class, 'exportarPacientes'])->name('exportarPacientes');
 Route::get('/exportarIngresos', [App\Http\Controllers\HomeController::class, 'exportarIngresos'])->name('exportarIngresos');
@@ -32,5 +32,7 @@ Route::get('/exportarHospitalizacion', [App\Http\Controllers\HomeController::cla
 Route::get('/exportDinamica/{tipo}', [ExportacionesController::class, 'exportToExcel'])->name('exportToExcel');
 Route::get('/salidaHospitalizacion/{id}', [App\Http\Controllers\HomeController::class, 'salidaHospitalizacion'])->name('salidaHospitalizacion');
 Route::post('/exportToExcelFiltrado', [ExportacionesController::class, 'exportToExcelFiltrado'])->name('exportToExcelFiltrado');
+Route::post('/actualizarPaciente', [App\Http\Controllers\HomeController::class, 'actulizarPaciente'])->name('actulizarPaciente');
+
 
 

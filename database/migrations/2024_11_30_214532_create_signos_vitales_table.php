@@ -16,7 +16,6 @@ return new class extends Migration
             $table->integer("paciente_id");
             $table->string("frecuencia_cardiaca",8,2);
             $table->string("tension_arterial");
-            $table->string("pulso");
             $table->integer("temperatura");
             $table->integer("frecuencia_respiratoria");
             $table->string("oxigenacion");
@@ -24,6 +23,7 @@ return new class extends Migration
             $table->float("talla",8,2);
             $table->timestamps();
         });
+        
     }
 
     /**

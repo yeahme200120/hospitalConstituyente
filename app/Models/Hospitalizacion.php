@@ -17,7 +17,6 @@ class Hospitalizacion extends Model
         "opcion_aceptacion",
         "opcion_sin_cambios",
         "intervalo", 
-        "servicio",
         "horario",
         "diaInicio",
         "mesInicio",

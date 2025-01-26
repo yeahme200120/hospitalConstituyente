@@ -19,7 +19,7 @@
                 </div>
             </form>
             <form action="/registrarSeguimiento2" method="POST" class="mt-3 container">
-                @csrf
+                @csrf   
                 <div class="accordion-item">
                     <h2 class="accordion-header " id="panelsStayOpen-headingOne">
                         <button class="accordion-button btn-secundario" type="button" data-bs-toggle="collapse"
@@ -98,18 +98,12 @@
                         </div>
                     </div>
                 </div>
-                <div class="accordion-item">
-                    <h2 class="accordion-header" id="panelsStayOpen-headingTwo">
-                        <button class="accordion-button collapsed btn-secundario" type="button" data-bs-toggle="collapse"
-                            data-bs-target="#panelsStayOpen-collapseTwo" aria-expanded="false"
-                            aria-controls="panelsStayOpen-collapseTwo">
-                            HOSPITALIZACION - URGENCIAS - QUIROFANO
-                        </button>
+                <div class="mt-3">
+                    <h5  class="btn-secundario text-center p-2" id="panelsStayOpen-headingTwo" style="border-radius:0%">
+                        INGRESO DE MEDICAMENTO  
                     </h2>
-                    <div id="panelsStayOpen-collapseTwo" class="accordion-collapse collapse show"
-                        aria-labelledby="panelsStayOpen-headingTwo">
                         <!-- Hospitalización - Urgencias - Quirófano -->
-                        <div class="card mb-4">
+                        <div class="card mb-4 " style="border: none">
                             <div class="card-body">
                                 <div class="row mb-3">
                                     <label for="medicamento" class="col-sm-2 col-form-label">Medicamento:</label>
@@ -142,73 +136,9 @@
                                         @enderror
                                     </div>
                                 </div>
-
-                                <!-- Botones de selección -->
                                 <div class="row mb-3">
-                                    <div class="col-sm-4">
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="radio" name="servicio"
-                                                id="urgencias" value="1" required
-                                                {{ old('servicio') == 1 ? 'checked' : '' }}>
-                                            <label class="form-check-label" for="urgencias">Urgencias</label>
-                                        </div>
-                                    </div>
-                                    <div class="col-sm-4">
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="radio" name="servicio"
-                                                id="hospitalizacion" value="2" required
-                                                {{ old('servicio') == 2 ? 'checked' : '' }}>
-                                            <label class="form-check-label" for="hospitalizacion">Hospitalización</label>
-                                        </div>
-                                    </div>
-                                    <div class="col-sm-4">
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="radio" name="servicio"
-                                                id="quirofano" value="3" required
-                                                {{ old('servicio') == 3 ? 'checked' : '' }}>
-                                            <label class="form-check-label" for="quirofano">Quirófano</label>
-                                        </div>
-                                    </div>
-                                    @error('servicio')
-                                        <div class="alert alert-danger">{{ $message }}</div>
-                                    @enderror
-                                </div>
-                                <div class="row mb-3">
-                                    <div class="col-6 col-md-3">
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="radio" name="opcion_duplicidad"
-                                                id="opcion_duplicidad" value="duplicidad" {{ old('duplicidad') }}>
-                                            <label class="form-check-label" for="duplicidad">Duplicidad</label>
-                                        </div>
-                                    </div>
-                                    <div class="col-6 col-md-3">
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="radio" name="opcion_intervencion"
-                                                id="opcion_intervencion" value="intervencion" {{ old('intervencion') }}>
-                                            <label class="form-check-label" for="intervencion">Intervencion</label>
-                                        </div>
-                                    </div>
-                                    <div class="col-6 col-md-3">
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="radio" name="opcion_aceptacion"
-                                                id="opcion_aceptacion" value="aceptacion" {{ old('aceptacion') }}>
-                                            <label class="form-check-label" for="aceptacion">Aceptación</label>
-                                        </div>
-                                    </div>
-                                    <div class="col-6 col-md-3">
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="radio" name="opcion_sin_cambios"
-                                                id="opcion_sin_cambios" value="Sin Cambios en la medicacion"
-                                                {{ old('sin_cambios') }}>
-                                            <label class="form-check-label" for="sin_cambios">Sin cambios en la
-                                                medicación</label>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="row mb-3">
-                                    <!-- Vía de Administración -->
-                                    <div class="col-md-6">
-                                        <label for="viaAdministracion" class="form-label">Vía de Administración</label>
+                                    <label for="viaAdministracion" class="col-sm-2 col-form-label">Vía de Administración</label>
+                                    <div class="col-sm-10">
                                         <select class="form-select" id="via" name="via" required>
                                             <option value="" disabled {{ old('via') ? '' : 'selected' }}>Selecciona
                                                 una via de Administración...</option>
@@ -220,67 +150,35 @@
                                             <div class="alert alert-danger">{{ $message }}</div>
                                         @enderror
                                     </div>
-                                    <!-- Interacciones -->
-                                    <div class="col-md-6">
-                                        <label for="interacciones" class="form-label">Interacciones</label>
-                                        <input type="text" class="form-control" id="interacciones"
-                                            name="interacciones" required value="{{ old('interacciones') }}">
-                                        @error('interacciones')
-                                            <div class="alert alert-danger">{{ $message }}</div>
-                                        @enderror
-                                    </div>
                                 </div>
-
                                 <div class="row mb-3">
-                                    <!-- Intervalo -->
-                                    <div class="col-md-6">
-                                        <label for="intervalo" class="form-label">Intervalo</label>
+                                    <label for="intervalo" class="col-sm-2 col-form-label">Intervalo</label>
+                                    <div class="col-sm-10">
                                         <input type="text" class="form-control" id="intervalo" name="intervalo"
-                                            required value="{{ old('intervalo') }}">
-                                        @error('intervalo')
-                                            <div class="alert alert-danger">{{ $message }}</div>
-                                        @enderror
+                                        required value="{{ old('intervalo') }}">
+                                    @error('intervalo')
+                                        <div class="alert alert-danger">{{ $message }}</div>
+                                    @enderror
                                     </div>
-                                    <!-- Contraindicaciones -->
-                                    <div class="col-md-6">
-                                        <label for="contraindicaciones" class="form-label">Contraindicaciones</label>
-                                        <input type="text" class="form-control" id="contraindicaciones"
-                                            name="contraindicaciones" required value="{{ old('contraindicaciones') }}">
-                                        @error('contraindicaciones')
-                                            <div class="alert alert-danger">{{ $message }}</div>
-                                        @enderror
-                                    </div>
-                                </div>
-
+                                </div>  
                                 <div class="row mb-3">
-                                    <!-- Horario -->
-                                    <div class="col-md-6">
-                                        <label for="horario" class="form-label">Horario</label>
+                                    <label for="horario" class="col-sm-2 col-form-label">Horario</label>
+                                    <div class="col-sm-10">
                                         <input type="time" class="form-control" id="horario" name="horario"
-                                            required value="{{ old('horario', date('H:i')) }}">
-                                        @error('time')
-                                            <div class="alert alert-danger">{{ $message }}</div>
-                                        @enderror
+                                        required value="{{ old('horario', date('H:i')) }}">
+                                    @error('time')
+                                        <div class="alert alert-danger">{{ $message }}</div>
+                                    @enderror
                                     </div>
-                                    <!-- Recomendación -->
-                                    <div class="col-md-6">
-                                        <label for="recomendacion" class="form-label">Recomendación</label>
-                                        <input type="text" class="form-control" id="recomendacion"
-                                            name="recomendacion" required value="{{ old('recomendacion') }}">
-                                        @error('recomendacion')
-                                            <div class="alert alert-danger">{{ $message }}</div>
-                                        @enderror
-                                    </div>
-                                </div>
+                                </div> 
                                 @php
                                     $mesActual = date('n');
                                     $diaActual = date('j');
                                     $añoActual = date('Y');
-                                @endphp
+                                @endphp 
                                 <div class="row mb-3">
-                                    <!-- Fecha de Inicio -->
-                                    <div class="col-md-6">
-                                        <label for="fechaInicio" class="form-label">Fecha de Inicio</label>
+                                    <label for="horario" class="col-sm-2 col-form-label">Fecha de Inicio</label>
+                                    <div class="col-sm-10">
                                         <div class="row g-2">
                                             <div class="col">
                                                 <select class="form-select" id="diaInicio" name="diaInicio" required>
@@ -324,21 +222,10 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <!-- Intervención -->
-                                    <div class="col-md-6">
-                                        <label for="intervencion" class="form-label">Intervención</label>
-                                        <input type="text" class="form-control" id="intervencion" name="intervencion"
-                                            required value="{{ old('intervencion') }}">
-                                        @error('intervencion')
-                                            <div class="alert alert-danger">{{ $message }}</div>
-                                        @enderror
-                                    </div>
-                                </div>
-
+                                </div> 
                                 <div class="row mb-3">
-                                    <!-- Fecha de Término -->
-                                    <div class="col-md-6">
-                                        <label for="fechaTermino" class="form-label">Fecha de Término</label>
+                                    <label for="horario" class="col-sm-2 col-form-label">Fecha Termino</label>
+                                    <div class="col-sm-10">
                                         <div class="row g-2">
                                             <div class="col">
                                                 <select class="form-select" id="diaTermino" name="diaTermino">
@@ -359,33 +246,114 @@
                                             <div class="col">
                                                 <select class="form-select" id="anioTermino" name="anioTermino">
                                                     <option value="" disabled selected>Selecciona el año</option>
-                                                    @for ($i = date('Y'); $i >= 1900; $i--)
+                                                    @for ($i = date('Y') + 10; $i >= 1900; $i--)
                                                         <option value="{{ $i }}">{{ $i }}</option>
                                                     @endfor
                                                 </select>
                                             </div>
                                         </div>
                                     </div>
+                                </div> 
+                                <div class="fondo-principal mt-5 mb-5" style="border-radius: 2rem">
+                                    <label for=""></label>
+                                </div>
+                        
+                                <div class="row mb-3">
+                                    <!-- Interacciones -->
+                                    <div class="row">
+                                        <div class="col-2">
+                                            <label for="interacciones" class="form-label">Interacciones</label>
+                                    </div>
+                                    <divv class="col-10">
+                                        <input type="text" class="form-control col-10" id="interacciones"
+                                            name="interacciones" value="{{ old('interacciones') }}">
+                                        @error('interacciones')
+                                            <div class="alert alert-danger">{{ $message }}</div>
+                                        @enderror
+                                    </divv>
+                                    </div>
+                                </div>
+
+                                <div class="row mb-3">
+                                    <!-- Contraindicaciones -->
+                                    <div class="row">
+                                        <div class="col-2">
+                                            <label for="contraindicaciones" class="form-label">Contraindicaciones</label>
+
+                                        </div>
+                                        <div class="col-10">
+                                            <input type="text" class="form-control" id="contraindicaciones"
+                                                name="contraindicaciones" value="{{ old('contraindicaciones') }}">
+                                            @error('contraindicaciones')
+                                                <div class="alert alert-danger">{{ $message }}</div>
+                                            @enderror
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row mb-3">
+                                    <!-- Recomendación -->
+                                    <div class="row">
+                                        <div class="col-2">
+                                            <label for="recomendacion" class="form-label">Recomendación</label>
+                                        </div>
+                                        <div class="col-10">
+                                            <input type="text" class="form-control" id="recomendacion"
+                                                name="recomendacion" value="{{ old('recomendacion') }}">
+                                            @error('recomendacion')
+                                                <div class="alert alert-danger">{{ $message }}</div>
+                                            @enderror
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="row mb-3">
+                            
+                                    <!-- Intervención -->
+                                    <div class="row"> 
+                                        <div class="col-2">
+                                            <label for="intervencion" class="form-label">Intervención</label>
+                                    </div>
+                                    <div class="col-10">
+                                        <input type="text" class="form-control" id="intervencion" name="intervencion"
+                                             value="{{ old('intervencion') }}">
+                                        @error('intervencion')
+                                            <div class="alert alert-danger">{{ $message }}</div>
+                                        @enderror
+                                    </div>
+                                    </div>
+                                </div>
+
+                                <div class="row mb-3">
                                     <!-- Otros -->
-                                    <div class="col-md-6">
-                                        <label for="otros" class="form-label">Otros</label>
+                                    <div class="row"> 
+                                        <div class="col-2">
+                                            <label for="otros" class="form-label">Otros</label>
+
+                                    </div>
+                                    <div class="col-10">
                                         <input type="text" class="form-control" id="otros" name="otros"
-                                            required value="{{ old('otros') }}">
+                                         value="{{ old('otros') }}">
                                         @error('otros')
                                             <div class="alert alert-danger">{{ $message }}</div>
                                         @enderror
+                                    </div>
                                     </div>
                                 </div>
 
                                 <div class="row mb-3">
                                     <!-- Acción Tomada -->
-                                    <div class="col-md-6">
-                                        <label for="accionTomada" class="form-label">Acción Tomada</label>
+                                    <div class="row"> 
+                                        <div class="col-2">
+                                            <label for="accionTomada" class="form-label">Acción Tomada</label>
+                                    </div>
+                                    <div class="col-10">
                                         <input class="form-control" id="accionTomada" name="accionTomada" rows="2"
-                                            required value="{{ old('accionTomada') }}">
+                                             value="{{ old('accionTomada') }}">
                                         @error('accionTomada')
                                             <div class="alert alert-danger">{{ $message }}</div>
                                         @enderror
+                                    </div>
                                     </div>
                                 </div>
 
@@ -398,7 +366,7 @@
                                 </div>
                             </div>
                         </div>
-                    </div>
+
                 </div>
             </form>
         </div>
@@ -418,7 +386,7 @@
                 let medicamento = $("#medicamento").val() ? $("#medicamento").val() : ''
                 let dosis_max = $("#dosis_max").val() ? $("#dosis_max").val() : ''
                 let dosis_administrada = $("#dosis_administrada").val() ? $("#dosis_administrada").val() : ''
-                let servicio = $('input[name="servicio"]:checked').val();
+                //let servicio = $('input[name="servicio"]:checked').val();
                 let id_via_administracion = $("#id_via_administracion").val() ? $("#id_via_administracion").val() : ''
                 let interacciones = $("#interacciones").val() ? $("#interacciones").val() : ''
                 let intervalo = $("#intervalo").val() ? $("#intervalo").val() : ''
@@ -446,7 +414,7 @@
                     medicamento: medicamento ? medicamento : '',
                     dosis_max: dosis_max ? dosis_max : '',
                     dosis_administrada: dosis_administrada ? dosis_administrada : '',
-                    servicio: servicio ? servicio : '',
+                    //servicio: servicio ? servicio : '',
                     id_via_administracion: id_via_administracion ? id_via_administracion : '',
                     interacciones: interacciones ? interacciones : '',
                     intervalo: intervalo ? intervalo : '',

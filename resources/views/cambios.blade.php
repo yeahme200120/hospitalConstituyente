@@ -5,7 +5,7 @@
         <div class="accordion" id="accordionPanelsStayOpenExample">
             <form action="/actualizacionCambios" method="POST" class="mt-3 container">
                 @csrf
-                <input class="form-control" type="hidden" name="paciente_id" value="{{$paciente->id}}">
+                <input class="form-control" type="hidden" name="paciente_id" value="{{$pacientes->id}}">
                 <input class="form-control" type="hidden" name="id" value="{{$hospitalizacion->id}}">
                 <div class="accordion-item">
                     <h2 class="accordion-header" id="panelsStayOpen-headingTwo">
@@ -57,7 +57,7 @@
                                         </div>
                                     </div>
                                     <div class="col-12">
-                                        <div class="row">
+                                        {{-- <div class="row">
                                             <!-- Servicio -->
                                             <div class="form-group">
                                                 <label for="servicio">Servicio:</label>
@@ -74,7 +74,7 @@
                                                 @enderror
                                             </div>
 
-                                        </div>
+                                        </div> --}}
                                         <div class="row">
                                             <!-- Cama -->
                                             <div class="form-group">
@@ -114,56 +114,49 @@
                                     <div class="col-md-6 form-group">
                                         <label for="frecuencia_cardiaca">Frecuencia Cardíaca:</label>
                                         <input type="number"  id="frecuencia_cardiaca"
-                                            class="form-control" placeholder="Latidos por minuto" value="{{$signos->frecuencia_cardiaca}}" readonly>
+                                            class="form-control" placeholder="Latidos por minuto" value="{{$signos->frecuencia_cardiaca}}" >
                                     </div>
 
                                     <!-- Tensión Arterial -->
                                     <div class="col-md-6 form-group">
                                         <label for="tension_arterial">Tensión Arterial:</label>
                                         <input type="text"  id="tension_arterial"
-                                            class="form-control" placeholder="Ejemplo: 120/80" value="{{$signos->tension_arterial}}" readonly>
-                                    </div>
-
-                                    <!-- Pulso -->
-                                    <div class="col-md-6 form-group">
-                                        <label for="pulso">Pulso:</label>
-                                        <input type="number"  id="pulso" class="form-control"
-                                            placeholder="Pulsaciones por minuto" value="{{$signos->pulso}}" readonly>
+                                            class="form-control" placeholder="Ejemplo: 120/80" value="{{$signos->tension_arterial}}" >
                                     </div>
 
                                     <!-- Temperatura -->
                                     <div class="col-md-6 form-group">
                                         <label for="temperatura">Temperatura:</label>
                                         <input type="number"  id="temperatura" class="form-control"
-                                            placeholder="En grados Celsius" value="{{$signos->frecuencia_respiratoria}}" readonly>
+                                            placeholder="En grados Celsius" value="{{$signos->frecuencia_respiratoria}}" >
                                     </div>
 
                                     <!-- Frecuencia Respiratoria -->
                                     <div class="col-md-6 form-group">
                                         <label for="frecuencia_respiratoria">Frecuencia Respiratoria:</label>
                                         <input type="number"  id="frecuencia_respiratoria"
-                                            class="form-control" placeholder="Respiraciones por minuto" value="{{$signos->frecuencia_respiratoria}}" readonly>
+                                            class="form-control" placeholder="Respiraciones por minuto" value="{{$signos->frecuencia_respiratoria}}" >
                                     </div>
 
                                     <!-- Oxigenación -->
                                     <div class="col-md-6 form-group">
                                         <label for="oxigenacion">Oxigenación:</label>
                                         <input type="number" id="oxigenacion" class="form-control"
-                                            placeholder="Porcentaje de oxígeno" value="{{$signos->oxigenacion}}" readonly>
+                                            placeholder="Porcentaje de oxígeno" value="{{$signos->oxigenacion}}" >
                                     </div>
 
                                     <!-- Peso -->
                                     <div class="col-md-6 form-group">
                                         <label for="peso">Peso:</label>
                                         <input type="number" id="peso" class="form-control"
-                                            placeholder="En kilogramos" value="{{$signos->peso}}" readonly>
+                                            placeholder="En kilogramos" value="{{$signos->peso}}" >
                                     </div>
 
                                     <!-- Talla -->
                                     <div class="col-md-6 form-group">
                                         <label for="talla">Talla:</label>
                                         <input type="number" id="talla" class="form-control"
-                                            placeholder="En centímetros" value="{{$signos->talla}}" readonly>
+                                            placeholder="En centímetros" value="{{$signos->talla}}" >
                                     </div>
                                 </div>
                             </div>
@@ -188,7 +181,7 @@
                                             <label for="medicoTratante" class="col-sm-2 col-form-label">Médico
                                                 Tratante:</label>
                                             <div class="col-sm-10">
-                                                <select class="form-select" id="medicoTratante" name="medicoTratante" disabled>
+                                                <select class="form-select" id="medicoTratante" name="medicoTratante">
                                                     @foreach ($medicos as $medico)
                                                         <option value="{{ $medico->id }}" @if($tratamiento->id_medico == $medico->id) selected @endif>{{ $medico->nombre }}</option>
                                                     @endforeach
@@ -202,20 +195,20 @@
                                             <label for="diagnosticoAgregado" class="col-sm-2 col-form-label">Diagnóstico
                                                 Agregado:</label>
                                             <div class="col-sm-10">
-                                                <textarea class="form-control" id="diagnosticoAgregado" rows="2" required readonly>{{{$tratamiento->diagnostico_agregado}}}</textarea>
+                                                <textarea class="form-control" id="diagnosticoAgregado" rows="2" required >{{{$tratamiento->diagnostico_agregado}}}</textarea>
                                             </div>
                                         </div>
                                         <div class="row mb-3">
                                             <label for="diagnosticoEgreso" class="col-sm-2 col-form-label">Diagnóstico
                                                 Egreso:</label>
                                             <div class="col-sm-10">
-                                                <textarea class="form-control" id="diagnosticoEgreso"  rows="2" required readonly> {{{$tratamiento->diagnostico_egreso}}}</textarea>
+                                                <textarea class="form-control" id="diagnosticoEgreso"  rows="2" required > {{{$tratamiento->diagnostico_egreso}}}</textarea>
                                             </div>
                                         </div>
                                         <div class="row mb-3">
                                             <label for="laboratorios" class="col-sm-2 col-form-label">Laboratorios:</label>
                                             <div class="col-sm-10">
-                                                <textarea class="form-control" id="laboratorios" rows="2" required readonly>{{{$tratamiento->laboratorios}}}</textarea>
+                                                <textarea class="form-control" id="laboratorios" rows="2" required >{{{$tratamiento->laboratorios}}}</textarea>
                                                 @error('laboratorios')
                                                     <div class="alert alert-danger">{{ $message }}</div>
                                                 @enderror

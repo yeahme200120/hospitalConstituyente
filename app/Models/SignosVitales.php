@@ -10,7 +10,6 @@ class SignosVitales extends Model
         "paciente_id",
         'frecuencia_cardiaca',
         'tension_arterial',
-        'pulso',
         'temperatura',
         'frecuencia_respiratoria',
         'oxigenacion',
