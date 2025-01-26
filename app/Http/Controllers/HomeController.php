@@ -7,6 +7,7 @@ use App\Exports\IngresosExport;
 use App\Exports\PacientesExport;
 use App\Exports\SignosExport;
 use App\Exports\TratamientoExport;
+use App\Models\User;
 use App\Models\CatalogoCamas;
 use App\Models\CatalogoEnfermedadesCronicas;
 use App\Models\CatalogoMedicos;
@@ -20,6 +21,8 @@ use App\Models\tablaHospital;
 use App\Models\Tratatamiento;
 use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Auth;
 
 class HomeController extends Controller
 {
@@ -221,17 +224,15 @@ class HomeController extends Controller
     }
     public function enHospital(Request $request)
     {
-        /* $hospitalizados = Hospitalizacion::join('pacientes as p', 'p.id', '=', 'hospitalizacions.paciente_id')
-        ->join('ingresos as i', 'i.paciente_id', '=', 'hospitalizacions.paciente_id')
-        ->join('catalogo_servicios as c', 'c.id', '=', 'i.id_servicio')
-            ->join('catalogo_camas as camas', 'camas.id', '=', 'i.id_cama')
-            ->where("hospitalizacions.estatus", "=", 1)
-            ->select('hospitalizacions.*', 'c.servicio', 'p.nombre', 'camas.cama', 'p.id as Paciente_Id')
-            ->orderBy('hospitalizacions.created_at', 'desc')
-            ->paginate(5); */
         $hospitalizados = tablaHospital::where("id_Estatus", "=", 1)->orderBy('fecha', 'desc')->get();
 
         return view("enHospital", compact("hospitalizados"));
+    }
+    public function reporteServicio(Request $request)
+    {
+        $hospitalizados = tablaHospital::where("id_Estatus", "=", 1)->orderBy('fecha', 'desc')->get();
+
+        return view("reporteServicio", compact("hospitalizados"));
     }
     public function seguimientoTratamiento()
     {
@@ -616,6 +617,23 @@ class HomeController extends Controller
             }
         } else {
             return redirect()->back()->withErrors(['error' => 'No se pudo actaalizr el paciente']);
+        }
+    }
+    public function actualizarContra(Request $request){
+        if(!$request->contra || $request->contra == '' || $request->contra == null){
+            return redirect()->back()->withErrors(['error' => 'Tienes que ingresar la nueva contraseña']);
+        }else{
+            try{
+            $id = auth()->user()->id;
+            $usuario = User::find($id);
+            $usuario->password = Hash::make($request->contra);
+            if($usuario->save()){
+                auth()->logout();
+                return redirect('/login')->with('success', 'Contraseña actualizada correctamente'); 
+            }
+        }catch(\Exception $e){
+            dd($e);
+        }
         }
     }
 }

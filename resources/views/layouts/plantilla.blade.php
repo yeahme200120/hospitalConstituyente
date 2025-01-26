@@ -62,22 +62,63 @@
             <div class="container-fluid">
                 <div class="collapse navbar-collapse row" id="navbarSupportedContent">
                     <a href="/home" class="col-1 fondo-principal cabeceraImg" onclick="redirect()">
-                        <img src="{{ asset('img/LogoN.png') }}" alt=""
+                        <img src="{{ asset('img/LogoN.png') }}" alt="Logo" 
                             style="margin:0; padding:0; position:fixed;" width="210">
                     </a>
-                    <form method="POST" action="{{ route('logout') }}" class="col-10 text-end text-white p-2">
-                        @csrf
-                        <button class="text-white" type="submit"
-                            style="background-color: transparent; border:none">{{ Auth::user()->name }}</button>
-                    </form>
+                    <div class="col-10 text-end text-white p-2">
+                        <div class="dropdown">
+                            <button class="btn text-white dropdown-toggle" type="button" id="userDropdown" 
+                                data-bs-toggle="dropdown" aria-expanded="false" 
+                                style="background-color: transparent; border: none;">
+                                {{ Auth::user()->name }}
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                                <li>
+                                    <a class="dropdown-item" onclick="cambiarCotra()">
+                                        <i class="bi bi-key"></i> Cambiar Contraseña
+                                    </a>
+                                </li>
+                                <li>
+                                    <form method="POST" action="{{ route('logout') }}">
+                                        @csrf
+                                        <button type="submit" class="dropdown-item">
+                                            <i class="bi bi-box-arrow-right"></i> Cerrar Sesión
+                                        </button>
+                                    </form>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
                 </div>
             </div>
         </nav>
+        
 
         <main class="py-4 pt-5">
             @yield('content')
         </main>
     </div>
+
+    <div class="modal fade" id="cambiarContra" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="exampleModalLabel">Cambiar Contraseña</h5>
+            </div>
+            <form action="actualizarContra" method="post">
+                @csrf
+                <div class="modal-body">
+                    <label for="" class="p-2">Nueva Contraseña</label>
+                  <input class="form-control" type="text" name="contra" id="contra" required>
+                </div>
+                <div class="modal-footer">
+                  <a onclick="cerrarModal()" class="btn btn-secondary" data-dismiss="modal">Close</a>
+                  <button type="submit" class="btn btn-primary">Save changes</button>
+                </div>
+            </form>
+          </div>
+        </div>
+      </div>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js
             "></script>
 </body>
@@ -86,6 +127,13 @@
     $(document).ready(function() {
         $('.select2').select2();
     });
+    function cambiarCotra(){
+        $("#cambiarContra").modal("show");
+    }
+    function cerrarModal(){
+        $("#contra").val('');
+        $("#cambiarContra").modal("hide");
+    }
 </script>
 
 </html>

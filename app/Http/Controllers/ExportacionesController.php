@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\CatalogoServicios;
 use App\Models\Hospitalizacion;
 use App\Models\Ingresos;
 use App\Models\Pacientes;
@@ -10,13 +11,15 @@ use App\Models\Tratatamiento;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Date;
+use Illuminate\Support\Facades\DB as FacadesDB;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use Illuminate\Support\Facades\Response;
+use Illuminate\Support\Facades\DB;
 
 class ExportacionesController extends Controller
 {
-    public function exportToExcel($tipo)
+    public function exportToExcel($tipo,$fecha_inicio,$fecha_fin)
     {
         // Crea un nuevo archivo Excel
         $spreadsheet = new Spreadsheet();
@@ -26,78 +29,73 @@ class ExportacionesController extends Controller
             case 'PACIENTE-INGRESO':
                 $headers = [
                     "Fecha",
-                    "id",
-                    "nombre",
-                    "fecha_nac_dia",
-                    "fecha_nac_mes",
-                    "fecha_nac_año",
-                    "edad",
-                    "genero",
-                    "enfermedad",
-                    "telefono",
-                    "alergias",
-                    "ingreso_dia",
-                    "ingreso_mes",
-                    "ingreso_año",
-                    "ingreso_hora",
-                    "diagnostico",
-                    "servicio",
-                    "cama",
-                    "frecuencia_cardiaca",
-                    "pulso",
-                    "frecuencia_respiratoria",
-                    "tencion_arterial",
-                    "temperatura",
-                    "oxigenacion",
-                    "peso",
-                    "talla",
-                    "nombre",
-                    "laboratorios",
-                    "diagnostico_agregado",
-                    "diagnostico_egreso"
+                    "Id Paciente",
+                    "Nombre",
+                    "Fecha de nacimiento",
+                    "Edad",
+                    "Genero",
+                    "Enfermedades Cronicas",
+                    "Telefono",
+                    "Alergias",
+                    "Fecha de ingreso",
+                    "Hora de ingreso",
+                    "Diagnostico de Ingreso",
+                    "Servicio",
+                    "Cama",
+                    "FC",
+                    "FR",
+                    "TA",
+                    "Temperatura",
+                    "So2",
+                    "Peso",
+                    "Talla",
+                    "Medico tratante",
+                    "Laboratorios",
+                    "Diagnostico Agregado",
+                    "Diagnostico Egreso"
                 ];
                 $sheet->fromArray($headers, null, 'A1'); // Inserta las cabeceras en la primera fila
                 // Recupera los datos
-                $datos = Ingresos::select(
-                            "pa.created_at",
-                            "pa.id",
-                            "pa.nombre",
-                            "pa.fecha_nac_dia",
-                            "pa.fecha_nac_mes",
-                            "pa.fecha_nac_año",
-                            "pa.edad",
-                            "pa.genero",
-                            "enfermedades.enfermedad",
-                            "pa.telefono",
-                            "pa.alergias",
-                            "ingresos.ingreso_dia",
-                            "ingresos.ingreso_mes",
-                            "ingresos.ingreso_año",
-                            "ingresos.ingreso_hora",
-                            "ingresos.diagnostico",
-                            "servicio.servicio",
-                            "camas.cama",
-                            "signos.frecuencia_cardiaca",
-                            "signos.pulso",
-                            "signos.frecuencia_respiratoria",
-                            "signos.tension_arterial",
-                            "signos.temperatura",
-                            "signos.oxigenacion",
-                            "signos.peso",
-                            "signos.talla",
-                            "medicos.nombre",
-                            "tra.laboratorios",
-                            "tra.diagnostico_agregado",
-                            "tra.diagnostico_egreso"
+
+                        $datos = Pacientes::select(
+                            DB::raw("DATE_FORMAT(hospital.fecha, '%d-%m-%Y') as fecha"),
+                            "pacientes.id_paciente as id_paciente",
+                            DB::raw("CONCAT(LPAD(pacientes.fecha_nac_dia, 2, '0'), '-', LPAD(pacientes.fecha_nac_mes, 2, '0'), '-', pacientes.fecha_nac_año) as fecha_nacimiento"),
+                            "pacientes.nombre as nombre",
+                            'pacientes.edad',
+                            "pacientes.genero",
+                            "pacientes.id_enfermedad_cronica",
+                            "pacientes.telefono",
+                            "pacientes.alergias",
+                            DB::raw("CONCAT(LPAD(ing.ingreso_dia, 2, '0'), '-', LPAD(ing.ingreso_mes, 2, '0'), '-', ing.ingreso_año) as fecha_ingreso"),
+                            "ing.ingreso_hora",
+                            "ing.diagnostico",
+                             "servicio.servicio as servicio",
+                             "camas.cama",
+                             "signos.frecuencia_cardiaca as fc",
+                             "signos.frecuencia_respiratoria as fr",
+                             "signos.tension_arterial as ta",
+                             "signos.temperatura as temperatura",
+                             "signos.oxigenacion",
+                             "signos.peso",
+                             "signos.talla",
+                             "medico.nombre as medico",
+                             "tr.diagnostico_agregado",
+                             "tr.diagnostico_egreso",
+                             "tr.laboratorios"
+
                             )
-                        ->join("pacientes as pa","pa.id","=","ingresos.paciente_id")
-                        ->join("signos_vitales as signos","signos.paciente_id","=","ingresos.paciente_id")
-                        ->join("tratatamientos as tra","tra.paciente_id","=","ingresos.paciente_id")
-                        ->join("catalogo_medicos as medicos","medicos.id","=","tra.id_medico")
-                        ->join("catalogo_servicios as servicio","servicio.id","=","ingresos.id_servicio")
-                        ->join("catalogo_camas as camas","camas.id","=","ingresos.id_cama")
-                        ->join("catalogo_enfermedades_cronicas as enfermedades","enfermedades.id","=","pa.id_enfermedad_cronica")
-                        ->get();
+                            ->join("tabla_hospitals as hospital","hospital.id_paciente","=","pacientes.id_paciente")
+                            ->join("ingresos as ing","ing.paciente_id","=","pacientes.id")
+                            ->join("catalogo_servicios as servicio","servicio.id","=","ing.id_servicio")
+                            ->join("catalogo_camas as camas","camas.id","=","ing.id_cama")
+                            ->join("signos_vitales as signos","signos.paciente_id","=","pacientes.id")
+                            ->join("tratatamientos as tr","tr.paciente_id","=","pacientes.id")
+                            ->join("catalogo_medicos as medico","medico.id","=","tr.id_medico")
+                            ->where("hospital.fecha",">=",$fecha_inicio)
+                            ->where("hospital.fecha","<=",$fecha_fin)
+                            ->get();
+                            
                 break;
             case 'REPORTE SERVICIO':
                 $headers = [

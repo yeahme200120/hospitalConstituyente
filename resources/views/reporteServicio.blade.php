@@ -4,7 +4,7 @@
     <div class="container mt-3">
         <div class="row m-2 p-2 btn-secundario justify-content-center">
             <div class="col-5 col-md-3 text-center">
-                EN HOSPITAL
+                REPORTE DE SERVICIO
             </div>
         </div>  
         <div class="table table-responsive">
@@ -17,17 +17,9 @@
                             class="text-center m-1 p-1">Nombre</th>
                         <th scope="col" style="background-color: #28a58d; color: white; border-radius: 2rem;"
                             class="text-center m-1 p-1">Fecha Ingreso</th>
-                        <th scope="col" style="background-color: #28a58d; color: white; border-radius: 2rem;"
-                            class="text-center m-1 p-1">Hora Ingreso</th>
-                        <th scope="col" style="background-color: #28a58d; color: white; border-radius: 2rem;"
-                            class="text-center m-1 p-1">Servicio</th>
-                        <th scope="col" style="background-color: #28a58d; color: white; border-radius: 2rem;"
-                            class="text-center m-1 p-1">Cama</th>
-                        <th style="background-color: #28a58d; color: white; border-radius: 2rem;"
-                            class="text-center m-1 p-1">Editar</th>
                     </tr>
                 </thead>
-                <tbody class="p-3">
+                <tbody class="p-3" id="cuerpoReporteServicio">
                     @foreach ($hospitalizados as $paciente)
                         <tr>
                             <td scope="row" style="background-color: #162f46; color: white; border-radius: 2rem;"
@@ -37,21 +29,11 @@
                                     class="text-white">{{ $paciente->paciente }} </a></td>
                             <td scope="row" style="background-color: #162f46; color: white; border-radius: 2rem;"
                                 class="text-center m-1 p-1">{{ date($paciente->fecha) }}</td>
-                            <td scope="row" style="background-color: #162f46; color: white; border-radius: 2rem;"
-                                class="text-center m-1 p-1">{{ $paciente->hora }}</td>
-                            <td scope="row" style="background-color: #162f46; color: white; border-radius: 2rem;"
-                                class="text-center m-1 p-1">{{ $paciente->servicio }}</td>
-                            <td scope="row" style="background-color: #162f46; color: white; border-radius: 2rem;"
-                                class="text-center m-1 p-1">{{ $paciente->cama }}</td>  
-                            <td scope="row" style="background-color: #162f46; color: white; border-radius: 2rem;"
-                                class="text-center m-1 p-1"><a class="text-white" href="/datosPaciente/{{ $paciente->id_paciente}}/{{$paciente->id}}"><i
-                                        class="bi bi-pencil-square"></i></a></td>
                         </tr>
                     @endforeach
                 </tbody>
             </table>
             <div class="d-flex justify-content-center">
-                {{-- {{ $hospitalizados->links() }} --}}
             </div>
         </div>
     </div>

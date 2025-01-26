@@ -29,10 +29,12 @@ Route::get('/exportarIngresos', [App\Http\Controllers\HomeController::class, 'ex
 Route::get('/exportarSignos', [App\Http\Controllers\HomeController::class, 'exportarSignos'])->name('exportarSignos');
 Route::get('/exportarTratamiento', [App\Http\Controllers\HomeController::class, 'exportarTratamiento'])->name('exportarTratamiento');
 Route::get('/exportarHospitalizacion', [App\Http\Controllers\HomeController::class, 'exportarHospitalizacion'])->name('exportarHospitalizacion');
-Route::get('/exportDinamica/{tipo}', [ExportacionesController::class, 'exportToExcel'])->name('exportToExcel');
+Route::get('/exportDinamica/{tipo}/{fecha_i}/{fecha_f}', [ExportacionesController::class, 'exportToExcel'])->name('exportToExcel');
 Route::get('/salidaHospitalizacion/{id}', [App\Http\Controllers\HomeController::class, 'salidaHospitalizacion'])->name('salidaHospitalizacion');
 Route::post('/exportToExcelFiltrado', [ExportacionesController::class, 'exportToExcelFiltrado'])->name('exportToExcelFiltrado');
 Route::post('/actualizarPaciente', [App\Http\Controllers\HomeController::class, 'actulizarPaciente'])->name('actulizarPaciente');
+Route::get('/reporteServicio', [App\Http\Controllers\HomeController::class, 'reporteServicio'])->name('reporteServicio');
+Route::post('/actualizarContra', [App\Http\Controllers\HomeController::class, 'actualizarContra'])->name('actualizarContra');
 
 
 

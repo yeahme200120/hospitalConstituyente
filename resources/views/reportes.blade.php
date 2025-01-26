@@ -12,7 +12,7 @@
         <div class="row">
             <div class="col-12 col-md-6">
                 <label for="">Fecha Inicio</label>
-                <input type="date" name="fecha" class="form-control">
+                <input type="date" name="fecha" id="fecha" class="form-control">
             </div>
             <div class="col-12 col-md-6">
                 <label for="">Fecha Fin</label>
@@ -20,8 +20,8 @@
             </div>
         </div>
         <div class="row mt-5 justify-content-md-center">
-            <div class="col-12 col-md-2 btn-secundario p-2 m-2 text-center"><a href="/exportDinamica/PACIENTE-INGRESO" class="text-center text-white">PACIENTE-INGRESO</a></div>
-            <div class="col-12 col-md-2 btn-secundario p-2 m-2 text-center"><button type="submit" style="background-color: transparent; border:none;" class="text-center text-white">REPORTE SERVICIO</button></div>    
+            <div class="col-12 col-md-2 btn-secundario p-2 m-2 text-center"><a onclick="generar()" class="text-center text-white">PACIENTE-INGRESO</a></div>
+            <div class="col-12 col-md-2 btn-secundario p-2 m-2 text-center"><a onclick="reporteServicio()" style="background-color: transparent; border:none;" class="text-center text-white">REPORTE SERVICIO</a></div>    
         </div>
     </form>
     </div>
@@ -51,7 +51,21 @@
                 toastr.success("{{ session('success') }}");
             @endif
         });
+        function generar(){
+            let f_i = $("#fecha").val()
+            let f_f = $("#fecha_fin").val()
+            console.log(f_f, f_i);
+            
+            if(f_i == null || f_i == '' || f_f == null || f_f == '' || !f_f || !f_i ){
+                toastr.error("Valida los campos de las fechas de inicio y de fin por favor....");
+            }else{
+                window.location.href = `/exportDinamica/PACIENTE-INGRESO/${f_i}/${f_f}`;
+            }
 
+        }
+        function reporteServicio(){
+            window.location.href = `/reporteServicio`;
+        }
         function calculaEdad() {
             let año = $("#fecha_nac_año").val()
             let fecha = new Date()
