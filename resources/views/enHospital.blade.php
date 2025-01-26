@@ -33,7 +33,7 @@
                             <td scope="row" style="background-color: #162f46; color: white; border-radius: 2rem;"
                                 class="text-center m-1 p-1">{{ $paciente->id }}</td>
                             <td scope="row" style="background-color: #162f46; color: white; border-radius: 2rem;"
-                                class="text-center m-1 p-1"><a href="/cambios/{{ $paciente->id_paciente }}"
+                                class="text-center m-1 p-1"><a href="/cambios/{{ $paciente->id_paciente }}/{{$paciente->id}}"
                                     class="text-white">{{ $paciente->paciente }} </a></td>
                             <td scope="row" style="background-color: #162f46; color: white; border-radius: 2rem;"
                                 class="text-center m-1 p-1">{{ date($paciente->fecha) }}</td>
@@ -75,7 +75,7 @@
                 dom: 'Bfrtip',
                 buttons: [{
                     extend: 'pdfHtml5',
-                    text: '<i class="fas fa-file-pdf"></i>',
+                    text: '<i class="fas fa-print "></i>',
                     title: 'En Hospital',
                     className: 'btn btn-danger',
                     orientation: 'portrait',

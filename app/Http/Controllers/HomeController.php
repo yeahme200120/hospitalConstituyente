@@ -75,6 +75,7 @@ class HomeController extends Controller
             'enfermedades_cronicas' => 'required',
             'telefono' => 'required',
             'alergias' => 'required',
+
             'dia' => 'required',
             'mes' => 'required',
             'anio' => 'required',
@@ -82,6 +83,7 @@ class HomeController extends Controller
             'diagnostico_ingreso' => 'required',
             'servicio' => 'required',
             'cama' => 'required',
+
             'frecuencia_cardiaca' => 'required',
             'tension_arterial' => 'required',
             'temperatura' => 'required',
@@ -386,11 +388,12 @@ class HomeController extends Controller
             return $th;
         }
     }
-    public function cambios($paciente_id)
+    public function cambios($paciente_id, $id_hospital)
     {
         //Seccion de los
-        $pacientes = Pacientes::where("id_paciente", "=",$paciente_id)->first();
-        $hospitalizacion = Hospitalizacion::where("paciente_id","=",$pacientes->id)->first();
+        $pacientes = Pacientes::where("id_paciente", "=", $paciente_id)->first();
+        $hospitalizacion = Hospitalizacion::where("paciente_id", "=", $pacientes->id)->first();
+        $tabla = tablaHospital::find($id_hospital);
         $ingresos = Ingresos::where('paciente_id', '=', $pacientes->id)->first();
         $signos = SignosVitales::where('paciente_id', '=', $pacientes->id)->first();
         $tratamiento = Tratatamiento::where("paciente_id", "=", $pacientes->id)->first();
@@ -399,16 +402,113 @@ class HomeController extends Controller
         $camas = CatalogoCamas::all();
         $medicos = CatalogoMedicos::all();
         $vias = CatalogoViaAdministracion::all();
-        return view("cambios", compact("pacientes", "signos", "tratamiento", "enfermedades", "servicios", "camas", "medicos", "vias", "ingresos", "hospitalizacion"));
+        return view("cambios", compact("pacientes", "signos", "tratamiento", "enfermedades", "servicios", "camas", "medicos", "vias", "ingresos", "hospitalizacion", "tabla"));
     }
     public function actualizacionCambios(Request $request)
     {
-        $ingreso = Ingresos::find($request->paciente_id);
-        //$ingreso->id_servicio = $request->servicio;
+        $rules = [
+            //Datos de los ingresos
+            'dia' => 'required',
+            'mes' => 'required',
+            'anio' => 'required',
+            'hora_ingreso' => 'required',
+            'diagnostico_ingreso' => 'required',
+            'servicio' => 'required',
+            'cama' => 'required',
+
+            'frecuencia_cardiaca' => 'required',
+            'tension_arterial' => 'required',
+            'temperatura' => 'required',
+            'frecuencia_respiratoria' => 'required',
+            'oxigenacion' => 'required',
+            'peso' => 'required',
+            'talla' => 'required',
+
+            //Campos del tratamiento
+            'medicoTratante' => 'required',
+            'diagnosticoAgregado' => 'required',
+            'diagnosticoEgreso' => 'required',
+            'laboratorios' => 'required',
+        ];
+
+        $messages = [
+            'dia.required' => 'El campo día es obligatorio.',
+            'mes.required' => 'El campo mes es obligatorio.',
+            'anio.required' => 'El campo año es obligatorio.',
+            'hora_ingreso.required' => 'El campo hora de ingreso es obligatorio.',
+            'diagnostico_ingreso.required' => 'El campo diagnóstico de ingreso es obligatorio.',
+            'servicio.required' => 'El campo servicio es obligatorio.',
+            'cama.required' => 'El campo cama es obligatorio.',
+
+            'frecuencia_cardiaca.required' => 'El campo frecuencia cardíaca es obligatorio.',
+            'tension_arterial.required' => 'El campo tensión arterial es obligatorio.',
+            'temperatura.required' => 'El campo temperatura es obligatorio.',
+            'frecuencia_respiratoria.required' => 'El campo frecuencia respiratoria es obligatorio.',
+            'oxigenacion.required' => 'El campo oxigenación es obligatorio.',
+            'peso.required' => 'El campo peso es obligatorio.',
+            'talla.required' => 'El campo talla es obligatorio.',
+
+            'medicoTratante.required' => 'El campo Delk medico tratante es un campo obligatorio,',
+            'diagnosticoAgregado.required' => 'El campo del diagnostico agregado es un campo Obligatorio',
+            'diagnosticoEgreso.required' => "El campo de Diagnostico de egreso es un campo Obligatirio",
+            'laboratorios.required' => "El campo de los laboratorios es un campo obligatorio"
+
+        ];
+        $respuesta = [];
+        $this->validate($request, $rules, $messages);
+        $paciente = Pacientes::find($request->paciente_id);
+
+        //Registro de ingresos
+        $ingreso = new Ingresos();
+        $ingreso->paciente_id = $paciente->id;
+        $ingreso->ingreso_dia = $request->dia;
+        $ingreso->ingreso_mes = $request->mes;
+        $ingreso->ingreso_año = $request->anio;
+        $ingreso->ingreso_hora = $request->hora_ingreso;
+        $ingreso->diagnostico = $request->diagnostico_ingreso;
+        $ingreso->id_servicio = $request->servicio;
         $ingreso->id_cama = $request->cama;
-        if ($ingreso->save()) {
-            return redirect()->route('enHospital')->with('success', 'Datos actualizados correctamente');
+
+        //Se genera el registro para en hospital
+        $serv = CatalogoServicios::find($request->servicio);
+        $ca = CatalogoCamas::find($request->cama);
+
+        $tabla = new tablaHospital();
+        $tabla->paciente =  $paciente->nombre;
+        $tabla->id_paciente = $paciente->id;
+        $tabla->fecha =  date(now());
+        $tabla->hora =  date("H:i:s");
+        $tabla->servicio =  $serv->servicio;
+        $tabla->id_servicio =  $serv->id;
+        $tabla->estatus =  "Activo";
+        $tabla->id_estatus =  1;
+        $tabla->cama =  $ca->cama;
+        $tabla->id_cama =  $ca->id;
+        $tabla->save();
+
+        //Registro de signos vitales
+        $signos = new SignosVitales();
+        $signos->paciente_id = $paciente->id;
+        $signos->frecuencia_cardiaca = $request->frecuencia_cardiaca;
+        $signos->tension_arterial = $request->tension_arterial;
+        $signos->temperatura = $request->temperatura;
+        $signos->frecuencia_respiratoria = $request->frecuencia_respiratoria;
+        $signos->oxigenacion = $request->oxigenacion;
+        $signos->peso = $request->peso;
+        $signos->talla = $request->talla;
+
+        if ($signos->save()) {
+            //Registro de Tratamiento
+            $tratamiento = new Tratatamiento();
+            $tratamiento->paciente_id =$paciente->id;
+            $tratamiento->id_medico = $request->medicoTratante ? $request->medicoTratante : '';
+            $tratamiento->diagnostico_agregado = $request->diagnosticoAgregado ? $request->diagnosticoAgregado : '';
+            $tratamiento->diagnostico_egreso = !$request->diagnosticoEgreso ? '' : $request->diagnosticoEgreso;
+            $tratamiento->laboratorios = $request->laboratorios ? $request->laboratorios : '';
+            $tratamiento->save();
+            return redirect()->route('enHospital')->with('success', `Se registro el nuevo dia del paciente $paciente->nombre`);
         } else {
+            return 0;
         }
     }
     public function datosPaciente($paciente_id, $hospital)
@@ -437,8 +537,9 @@ class HomeController extends Controller
     public function salidaHospitalizacion($id)
     {
         //Cambiamos el estatus de la hospitalizacion
-        $hospitalizacion = Hospitalizacion::find($id);
-        $hospitalizacion->estatus = 0;
+        $hospitalizacion = tablaHospital::find($id);
+        $hospitalizacion->estatus = "Salio";
+        $hospitalizacion->id_estatus = 0;
         if ($hospitalizacion->save()) {
             return redirect()->route('enHospital')->with('success', 'El paciente ya salió del hospital y solo estará disponible para su vista en la tabla de reporte de paciente-ingresos.');
         }
@@ -472,7 +573,7 @@ class HomeController extends Controller
         $rules = [
             'Id' => 'required',
             "id_hospital" => 'required',
-            "nombre"=> "required",
+            "nombre" => "required",
             "fecha_nac_dia" => "required",
             "fecha_nac_mes" => 'required',
             "fecha_nac_año" => "required",
@@ -508,9 +609,9 @@ class HomeController extends Controller
         if ($paciente->save()) {
             $hospital = tablaHospital::find($request->id_hospital);
             $hospital->paciente = $request->nombre;
-            if($hospital->save()){
+            if ($hospital->save()) {
                 return redirect()->route('enHospital')->with('success', 'Los datos del paaciente se actualizarón correctamente.');
-            }else{
+            } else {
                 return redirect()->back()->withErrors(['error' => 'No se pudo actualizar el registro']);
             }
         } else {
