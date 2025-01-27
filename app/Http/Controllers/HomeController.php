@@ -225,12 +225,11 @@ class HomeController extends Controller
     public function enHospital(Request $request)
     {
         $hospitalizados = tablaHospital::where("id_Estatus", "=", 1)->orderBy('fecha', 'desc')->get();
-
         return view("enHospital", compact("hospitalizados"));
     }
     public function reporteServicio(Request $request)
     {
-        $hospitalizados = tablaHospital::where("id_Estatus", "=", 1)->orderBy('fecha', 'desc')->get();
+        $hospitalizados = tablaHospital::where("id_estatus", "=", 1)->orderBy('fecha', 'desc')->get();
 
         return view("reporteServicio", compact("hospitalizados"));
     }
@@ -267,13 +266,6 @@ class HomeController extends Controller
             'diaInicio' => 'required',
             'mesInicio' => 'required',
             'anioInicio' => 'required',
-
-            /* 'interacciones' => 'required',
-            'contraindicaciones' => 'required',
-            'recomendacion' => 'required',
-            'intervencion' => 'required',
-            'otros' => 'required',
-            'accionTomada' => 'required', */
         ];
 
         $messages = [
@@ -290,13 +282,6 @@ class HomeController extends Controller
             'diaInicio.required' => 'El campo Dia de inicio es un campo obligatorio.',
             'mesInicio.required' => 'El campo Mes de inicio es un campo obligatorio.',
             'anioInicio.required' => 'El campo Año de inicio es un campo obligatorio.',
-
-            /* 'interacciones.required' => 'El campo Interacciones es un campo obligatorio.',
-            'contraindicaciones.required' => 'El campo Contraindicaciones es un campo obligatorio.',
-            'recomendacion.required' => 'El campo Recomendacion es un campo obligatorio.',
-            'intervencion.required' => 'El campo Intervencion es un campo obligatorio.',
-            'otros.required' => 'El campo Otros es un campo obligatorio.',
-            'accionTomada.required' => 'El campo Accion tomada es un campo obligatorio.', */
         ];
         $respuesta = [];
         $this->validate($request, $rules, $messages);
@@ -392,7 +377,7 @@ class HomeController extends Controller
     public function cambios($paciente_id, $id_hospital)
     {
         //Seccion de los
-        $pacientes = Pacientes::where("id_paciente", "=", $paciente_id)->first();
+        $pacientes = Pacientes::where("id_paciente","=", $paciente_id)->first();
         $hospitalizacion = Hospitalizacion::where("paciente_id", "=", $pacientes->id)->first();
         $tabla = tablaHospital::find($id_hospital);
         $ingresos = Ingresos::where('paciente_id', '=', $pacientes->id)->first();
@@ -499,15 +484,20 @@ class HomeController extends Controller
         $signos->talla = $request->talla;
 
         if ($signos->save()) {
-            //Registro de Tratamiento
-            $tratamiento = new Tratatamiento();
-            $tratamiento->paciente_id =$paciente->id;
-            $tratamiento->id_medico = $request->medicoTratante ? $request->medicoTratante : '';
-            $tratamiento->diagnostico_agregado = $request->diagnosticoAgregado ? $request->diagnosticoAgregado : '';
-            $tratamiento->diagnostico_egreso = !$request->diagnosticoEgreso ? '' : $request->diagnosticoEgreso;
-            $tratamiento->laboratorios = $request->laboratorios ? $request->laboratorios : '';
-            $tratamiento->save();
-            return redirect()->route('enHospital')->with('success', `Se registro el nuevo dia del paciente $paciente->nombre`);
+            try{
+                //Registro de Tratamiento
+                $tratamiento = new Tratatamiento();
+                $tratamiento->paciente_id =$paciente->id;
+                $tratamiento->id_medico = $request->medicoTratante ? $request->medicoTratante : '';
+                $tratamiento->diagnostico_agregado = $request->diagnosticoAgregado ? $request->diagnosticoAgregado : '';
+                $tratamiento->diagnostico_egreso = !$request->diagnosticoEgreso ? '' : $request->diagnosticoEgreso;
+                $tratamiento->laboratorios = $request->laboratorios ? $request->laboratorios : '';
+                if($tratamiento->save()){
+                    return redirect()->route('enHospital')->with('success', "Se registro el nuevo dia del paciente");
+                }
+            }catch(\Exception $exception){
+                dd($exception);
+            }
         } else {
             return 0;
         }

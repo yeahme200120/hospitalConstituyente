@@ -458,7 +458,6 @@
             console.log("Limpiando el formulario");
             
             try {
-                $("#pacienteId").val('')
                 $("#medicamento").val('')
                 $("#dosisMaxima").val('')
                 $("#dosisAdministrada").val('')
