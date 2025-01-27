@@ -44,7 +44,7 @@
                             <td scope="row" style="background-color: #162f46; color: white; border-radius: 2rem;"
                                 class="text-center m-1 p-1">{{ $paciente->cama }}</td>  
                             <td scope="row" style="background-color: #162f46; color: white; border-radius: 2rem;"
-                                class="text-center m-1 p-1"><a class="text-white" href="/datosPaciente/{{ $paciente->id}}/{{$paciente->id}}"><i
+                                class="text-center m-1 p-1"><a class="text-white" href="/datosPaciente/{{  $paciente->id_paciente}}/{{$paciente->id}}"><i
                                         class="bi bi-pencil-square"></i></a></td>
                         </tr>
                     @endforeach

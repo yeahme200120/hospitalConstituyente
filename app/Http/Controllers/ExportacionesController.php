@@ -60,8 +60,8 @@ class ExportacionesController extends Controller
                         $datos = Pacientes::select(
                             DB::raw("DATE_FORMAT(hospital.fecha, '%d-%m-%Y') as fecha"),
                             "pacientes.id_paciente as id_paciente",
-                            DB::raw("CONCAT(LPAD(pacientes.fecha_nac_dia, 2, '0'), '-', LPAD(pacientes.fecha_nac_mes, 2, '0'), '-', pacientes.fecha_nac_año) as fecha_nacimiento"),
                             "pacientes.nombre as nombre",
+                            DB::raw("CONCAT(LPAD(pacientes.fecha_nac_dia, 2, '0'), '-', LPAD(pacientes.fecha_nac_mes, 2, '0'), '-', pacientes.fecha_nac_año) as fecha_nacimiento"),
                             'pacientes.edad',
                             "pacientes.genero",
                             "pacientes.id_enfermedad_cronica",
@@ -94,6 +94,7 @@ class ExportacionesController extends Controller
                             ->join("catalogo_medicos as medico","medico.id","=","tr.id_medico")
                             ->where("hospital.fecha",">=",$fecha_inicio)
                             ->where("hospital.fecha","<=",$fecha_fin)
+                            ->orderBy('fecha', 'desc')
                             ->get();
                             
                 break;

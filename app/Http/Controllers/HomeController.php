@@ -461,7 +461,7 @@ class HomeController extends Controller
 
         $tabla = new tablaHospital();
         $tabla->paciente =  $paciente->nombre;
-        $tabla->id_paciente = $paciente->id;
+        $tabla->id_paciente = $paciente->id_paciente;
         $tabla->fecha =  date(now());
         $tabla->hora =  date("H:i:s");
         $tabla->servicio =  $serv->servicio;
