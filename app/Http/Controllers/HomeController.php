@@ -153,24 +153,6 @@ class HomeController extends Controller
             array_push($respuesta, ["paciente" => 1, "mensaje" => "Paciente actualizado exitosamente."]);
         }
 
-        /* $paciente = new Pacientes();
-
-        $paciente->nombre = $request->nombre;
-        $paciente->id_paciente = $request->id;
-        $paciente->fecha_nac_dia = $request->fecha_nac_dia;
-        $paciente->fecha_nac_mes = $request->fecha_nac_mes;
-        $paciente->fecha_nac_año = $request->fecha_nac_año;
-        $paciente->edad = $request->edad;
-        $paciente->genero = $request->genero;
-        $paciente->id_enfermedad_cronica = json_encode($request->enfermedades_cronicas);
-        $paciente->telefono = $request->telefono;
-        $paciente->alergias = $request->alergias;
-
-        if ($paciente->save()) {
-            array_push($respuesta, ["paciente" => 1]);
-        } else {
-            array_push($respuesta, ["paciente" => 0]);
-        } */
         //Registro de ingresos
         $ingreso = new Ingresos();
         $ingreso->paciente_id = $paciente->id;
@@ -229,7 +211,11 @@ class HomeController extends Controller
     }
     public function reporteServicio(Request $request)
     {
-        $hospitalizados = tablaHospital::where("id_estatus", "=", 1)->orderBy('fecha', 'desc')->get();
+        $hospitalizados = tablaHospital::select("tabla_hospitals.*", "p.id as pacienteSQL")
+            ->join("pacientes as p", "p.id_paciente", "=", "tabla_hospitals.id_paciente")
+            ->where("id_estatus", "=", 1)
+            ->orderBy('fecha', 'desc')
+            ->get();
 
         return view("reporteServicio", compact("hospitalizados"));
     }
@@ -327,8 +313,6 @@ class HomeController extends Controller
         $hospitalizacion->opcion_sin_cambios = !$request->opcion_sin_cambios ? null : $request->opcion_sin_cambios;
         $hospitalizacion->estatus = 1;
 
-
-
         if ($hospitalizacion->save()) {
             array_push($respuesta, ["hospitalizacion" => 1]);
             return redirect()->route('enHospital')->with('success', 'Registro correcto de Tratamiento y hospitalización');
@@ -339,11 +323,11 @@ class HomeController extends Controller
         try {
             //Registro de Hospitalización
             $hospitalizacion = new Hospitalizacion();
-            $hospitalizacion->paciente_id = $request->pacienteId ? $request->pacienteId : 0;
+            $hospitalizacion->paciente_id = $request->paciente_id ? $request->paciente_id : 0;
             $hospitalizacion->medicamento = $request->medicamento ? $request->medicamento : '';
-            $hospitalizacion->dosis_max = $request->dosisMaxima ? $request->dosisMaxima : 0;
-            $hospitalizacion->dosis_administrada = $request->dosisAdministrada ? $request->dosisAdministrada : 0;
-            $hospitalizacion->id_via_administracion = $request->via ? $request->via : 0;
+            $hospitalizacion->dosis_max = $request->dosis_max ? $request->dosis_max : 0;
+            $hospitalizacion->dosis_administrada = $request->dosis_administrada ? $request->dosis_administrada : 0;
+            $hospitalizacion->id_via_administracion = $request->id_via_administracion ? $request->id_via_administracion : 0;
             $hospitalizacion->intervalo = $request->intervalo ? $request->intervalo : '';
             $hospitalizacion->horario = $request->horario ? $request->horario : '';
             $hospitalizacion->diaInicio = $request->diaInicio ? $request->diaInicio : '';
@@ -362,7 +346,7 @@ class HomeController extends Controller
             $hospitalizacion->recomendacion = $request->recomendacion ? $request->recomendacion : '';
             $hospitalizacion->intervencion = $request->intervencion ? $request->intervencion : '';
             $hospitalizacion->otros = $request->otros ? $request->otros : '';
-            $hospitalizacion->accion_tomada = $request->accionTomada ? $request->accionTomada : '';
+            $hospitalizacion->accion_tomada = $request->accion_tomada ? $request->accion_tomada : '';
 
 
             if ($hospitalizacion->save()) {
@@ -377,7 +361,7 @@ class HomeController extends Controller
     public function cambios($paciente_id, $id_hospital)
     {
         //Seccion de los
-        $pacientes = Pacientes::where("id_paciente","=", $paciente_id)->first();
+        $pacientes = Pacientes::where("id_paciente", "=", $paciente_id)->first();
         $hospitalizacion = Hospitalizacion::where("paciente_id", "=", $pacientes->id)->first();
         $tabla = tablaHospital::find($id_hospital);
         $ingresos = Ingresos::where('paciente_id', '=', $pacientes->id)->first();
@@ -484,19 +468,54 @@ class HomeController extends Controller
         $signos->talla = $request->talla;
 
         if ($signos->save()) {
-            try{
+            try {
                 //Registro de Tratamiento
                 $tratamiento = new Tratatamiento();
-                $tratamiento->paciente_id =$paciente->id;
+                $tratamiento->paciente_id = $paciente->id;
                 $tratamiento->id_medico = $request->medicoTratante ? $request->medicoTratante : '';
                 $tratamiento->diagnostico_agregado = $request->diagnosticoAgregado ? $request->diagnosticoAgregado : '';
                 $tratamiento->diagnostico_egreso = !$request->diagnosticoEgreso ? '' : $request->diagnosticoEgreso;
                 $tratamiento->laboratorios = $request->laboratorios ? $request->laboratorios : '';
-                if($tratamiento->save()){
-                    return redirect()->route('enHospital')->with('success', "Se registro el nuevo dia del paciente");
+                if ($tratamiento->save()) {
+                    try {
+                        $hospitalizacion = new Hospitalizacion();
+                        $hospitalizacion->paciente_id = $paciente->id;
+                        $hospitalizacion->medicamento = $request->medicamento ? $request->medicamento : '';
+                        $hospitalizacion->dosis_max = $request->dosisMaxima ? $request->dosisMaxima : '';
+                        $hospitalizacion->dosis_administrada = $request->dosisAdministrada ? $request->dosisAdministrada : '';
+                        $hospitalizacion->id_via_administracion = $request->via ? $request->via : '';
+                        $hospitalizacion->interacciones = $request->interacciones ? $request->interacciones : '';
+                        $hospitalizacion->intervalo = $request->intervalo ? $request->intervalo : '';
+                        $hospitalizacion->contraindicaciones = $request->contraindicaciones ? $request->interacciones : '';
+                        $hospitalizacion->horario = $request->horario ? $request->horario : '';
+                        $hospitalizacion->recomendacion = $request->recomendacion ? $request->recomendacion : '';
+                        $hospitalizacion->diaInicio = $request->diaInicio ? $request->diaInicio : '';
+                        $hospitalizacion->mesInicio = $request->mesInicio ? $request->mesInicio : '';
+                        $hospitalizacion->anioInicio = $request->anioInicio ? $request->anioInicio : '';
+                        $hospitalizacion->diaTermino = $request->diaTermino ? $request->diaTermino : '';
+                        $hospitalizacion->mesTermino = $request->mesTermino ? $request->mesTermino : '';
+                        $hospitalizacion->anioTermino = $request->anioTermino ? $request->anioTermino : '';
+                        $hospitalizacion->intervencion = $request->intervencion ? $request->intervencion : '';
+                        $hospitalizacion->otros = $request->otros ? $request->otros : '';
+                        $hospitalizacion->accion_tomada = $request->accionTomada ? $request->accionTomada : '';
+                        $hospitalizacion->opcion_duplicidad = !$request->opcion_duplicidad ? '' : $request->opcion_duplicidad;
+                        $hospitalizacion->opcion_intervencion = !$request->opcion_intervencion ? '' : $request->opcion_intervencion;
+                        $hospitalizacion->opcion_aceptacion = !$request->opcion_aceptacion ? '' : $request->opcion_aceptacion;
+                        $hospitalizacion->opcion_sin_cambios = !$request->opcion_sin_cambios ? 'Sin cambios' : $request->opcion_sin_cambios;
+                        $hospitalizacion->estatus = 1;
+                        if ($hospitalizacion->save()) {
+                            return redirect()->route('enHospital')->with('success', "Se registro el nuevo dia del paciente");
+                        } else {
+                            return redirect()->back()->withErrors(['error' => "Error al tratar de registrar el medicamento..."]);
+                        }
+                    } catch (\Exception $e) {
+                        dd($e);
+                        return redirect()->back()->withErrors(['error' => $e]);
+                    }
                 }
-            }catch(\Exception $exception){
+            } catch (\Exception $exception) {
                 dd($exception);
+                return redirect()->back()->withErrors(['error' => $exception]);
             }
         } else {
             return 0;
@@ -609,21 +628,26 @@ class HomeController extends Controller
             return redirect()->back()->withErrors(['error' => 'No se pudo actaalizr el paciente']);
         }
     }
-    public function actualizarContra(Request $request){
-        if(!$request->contra || $request->contra == '' || $request->contra == null){
+    public function actualizarContra(Request $request)
+    {
+        if (!$request->contra || $request->contra == '' || $request->contra == null) {
             return redirect()->back()->withErrors(['error' => 'Tienes que ingresar la nueva contraseña']);
-        }else{
-            try{
-            $id = auth()->user()->id;
-            $usuario = User::find($id);
-            $usuario->password = Hash::make($request->contra);
-            if($usuario->save()){
-                auth()->logout();
-                return redirect('/login')->with('success', 'Contraseña actualizada correctamente'); 
+        } else {
+            try {
+                $id = auth()->user()->id;
+                $usuario = User::find($id);
+                $usuario->password = Hash::make($request->contra);
+                if ($usuario->save()) {
+                    auth()->logout();
+                    return redirect('/login')->with('success', 'Contraseña actualizada correctamente');
+                }
+            } catch (\Exception $e) {
+                dd($e);
             }
-        }catch(\Exception $e){
-            dd($e);
         }
-        }
+    }
+    public function filtro($filtro)
+    {
+        return Excel::download(new HospitalizacionExport($filtro), 'Hospitalizaciones.xlsx');
     }
 }

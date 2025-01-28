@@ -7,8 +7,16 @@
                 REPORTE DE SERVICIO
             </div>
         </div>  
-        <div class="table table-responsive">
-            <table class="table" id="tablaHospital">
+        <div class="table table-responsive mt-5">
+            {{-- <div class="row mt-5 mb-5 justify-content-end">
+                <div class="col-6 col-md-2">
+                    <button class="btn text-white" style="background-color: #162f46; border-radius: 2rem;" onclick="filtrar()">Buscar por nombre</button>
+                </div>
+                <div class="col-6">
+                    <input type="text" class="form-control" name="filtro" id="filtro">
+                </div>
+            </div> --}}
+            <table class="table" id="tablaReporte">
                 <thead>
                     <tr>
                         <th scope="col" style="background-color: #28a58d; color: white; border-radius: 2rem;"
@@ -25,7 +33,7 @@
                             <td scope="row" style="background-color: #162f46; color: white; border-radius: 2rem;"
                                 class="text-center m-1 p-1">{{ $paciente->id }}</td>
                             <td scope="row" style="background-color: #162f46; color: white; border-radius: 2rem;"
-                                class="text-center m-1 p-1"><a href="/cambios/{{ $paciente->id_paciente }}/{{$paciente->id}}"
+                                class="text-center m-1 p-1"><a onclick="filtrar({{$paciente->pacienteSQL}})"
                                     class="text-white">{{ $paciente->paciente }} </a></td>
                             <td scope="row" style="background-color: #162f46; color: white; border-radius: 2rem;"
                                 class="text-center m-1 p-1">{{ date($paciente->fecha) }}</td>
@@ -33,6 +41,7 @@
                     @endforeach
                 </tbody>
             </table>
+            {{-- {{$hospitalizados->links()}} --}}
             <div class="d-flex justify-content-center">
             </div>
         </div>
@@ -53,52 +62,28 @@
                     toastr.error("{{ $error }}");
                 @endforeach
             @endif
-            $('#tablaHospital').DataTable({
+            $('#tablaReporte').DataTable({
                 language: {
-                    url: '//cdn.datatables.net/plug-ins/1.13.7/i18n/es-ES.json'
-                },
-                dom: 'Bfrtip',
-                buttons: [{
-                    extend: 'pdfHtml5',
-                    text: '<i class="fas fa-print "></i>',
-                    title: 'En Hospital',
-                    className: 'btn btn-danger',
-                    orientation: 'portrait',
-                    pageSize: 'A4',
-                    exportOptions: {
-                        columns: ':not(:last-child)'
-                    },
-                    customize: function(doc) {
-                        // Definir márgenes personalizados
-                        doc.pageMargins = [20, 20, 20, 20]; // Izquierda, Arriba, Derecha, Abajo
-
-                        // Ajustar tabla al ancho completo
-                        var table = doc.content[1].table;
-                        var columnCount = table.body[0].length; // Número de columnas
-                        table.widths = Array(columnCount).fill(
-                        '*'); // Todas las columnas se ajustan proporcionalmente
-
-                        // Opcional: Cambiar tamaño de fuente
-                        doc.defaultStyle.fontSize = 10;
-
-                        // Ajustar contenido para caber en la página
-                        doc.content[1].layout = {
-                            fillColor: function(rowIndex, node, columnIndex) {
-                                return rowIndex % 2 === 0 ? '#f3f3f3' :
-                                null; // Alterna colores de fondo para filas
-                            }
-                        };
-
-                        // Configurar estilos de cabecera
-                        doc.styles.tableHeader = {
-                            fillColor: '#28a58d', // Fondo verde
-                            color: 'white', // Texto blanco
-                            alignment: 'center',
-                            fontSize: 12,
-                            bold: true
-                        };
+                    "decimal": "",
+                    "emptyTable": "No hay información",
+                    "info": "Mostrando _START_ a _END_ de _TOTAL_ Entradas",
+                    "infoEmpty": "Mostrando 0 to 0 of 0 Entradas",
+                    "infoFiltered": "(Filtrado de _MAX_ total entradas)",
+                    "infoPostFix": "",
+                    "thousands": ",",
+                    "lengthMenu": "Mostrar _MENU_ Entradas",
+                    "loadingRecords": "Cargando...",
+                    "processing": "Procesando...",
+                    "search": "Buscar:",
+                    "zeroRecords": "Sin resultados encontrados",
+                    "paginate": {
+                        "first": "Primero",
+                        "last": "Ultimo",
+                        "next": "Siguiente",
+                        "previous": "Anterior"
                     }
-                }]
+                },
+               
             });
         });
 
@@ -107,7 +92,11 @@
             let fecha = new Date()
             let edad = (fecha.getFullYear() - año);
             $("#edad").val(edad);
-
+        }
+        function filtrar(valor){
+            let filtro = valor;
+            console.log("Valor: ", filtro);
+            window.location.href = `/filtro/${filtro}`;
         }
     </script>
 @endsection

@@ -6,7 +6,7 @@
             <div class="col-5 col-md-3 text-center">
                 EN HOSPITAL
             </div>
-        </div>  
+        </div>
         <div class="table table-responsive">
             <table class="table" id="tablaHospital">
                 <thead>
@@ -33,7 +33,8 @@
                             <td scope="row" style="background-color: #162f46; color: white; border-radius: 2rem;"
                                 class="text-center m-1 p-1">{{ $paciente->id }}</td>
                             <td scope="row" style="background-color: #162f46; color: white; border-radius: 2rem;"
-                                class="text-center m-1 p-1"><a href="/cambios/{{ $paciente->id_paciente }}/{{$paciente->id}}"
+                                class="text-center m-1 p-1"><a
+                                    href="/cambios/{{ $paciente->id_paciente }}/{{ $paciente->id }}"
                                     class="text-white">{{ $paciente->paciente }} </a></td>
                             <td scope="row" style="background-color: #162f46; color: white; border-radius: 2rem;"
                                 class="text-center m-1 p-1">{{ date($paciente->fecha) }}</td>
@@ -42,9 +43,10 @@
                             <td scope="row" style="background-color: #162f46; color: white; border-radius: 2rem;"
                                 class="text-center m-1 p-1">{{ $paciente->servicio }}</td>
                             <td scope="row" style="background-color: #162f46; color: white; border-radius: 2rem;"
-                                class="text-center m-1 p-1">{{ $paciente->cama }}</td>  
+                                class="text-center m-1 p-1">{{ $paciente->cama }}</td>
                             <td scope="row" style="background-color: #162f46; color: white; border-radius: 2rem;"
-                                class="text-center m-1 p-1"><a class="text-white" href="/datosPaciente/{{  $paciente->id_paciente}}/{{$paciente->id}}"><i
+                                class="text-center m-1 p-1"><a class="text-white"
+                                    href="/datosPaciente/{{ $paciente->id_paciente }}/{{ $paciente->id }}"><i
                                         class="bi bi-pencil-square"></i></a></td>
                         </tr>
                     @endforeach
@@ -73,7 +75,24 @@
             @endif
             $('#tablaHospital').DataTable({
                 language: {
-                    url: '//cdn.datatables.net/plug-ins/1.13.7/i18n/es-ES.json'
+                    "decimal": "",
+                    "emptyTable": "No hay información",
+                    "info": "Mostrando _START_ a _END_ de _TOTAL_ Entradas",
+                    "infoEmpty": "Mostrando 0 to 0 of 0 Entradas",
+                    "infoFiltered": "(Filtrado de _MAX_ total entradas)",
+                    "infoPostFix": "",
+                    "thousands": ",",
+                    "lengthMenu": "Mostrar _MENU_ Entradas",
+                    "loadingRecords": "Cargando...",
+                    "processing": "Procesando...",
+                    "search": "Buscar:",
+                    "zeroRecords": "Sin resultados encontrados",
+                    "paginate": {
+                        "first": "Primero",
+                        "last": "Ultimo",
+                        "next": "Siguiente",
+                        "previous": "Anterior"
+                    }
                 },
                 dom: 'Bfrtip',
                 buttons: [{
@@ -94,7 +113,7 @@
                         var table = doc.content[1].table;
                         var columnCount = table.body[0].length; // Número de columnas
                         table.widths = Array(columnCount).fill(
-                        '*'); // Todas las columnas se ajustan proporcionalmente
+                            '*'); // Todas las columnas se ajustan proporcionalmente
 
                         // Opcional: Cambiar tamaño de fuente
                         doc.defaultStyle.fontSize = 10;
@@ -103,7 +122,7 @@
                         doc.content[1].layout = {
                             fillColor: function(rowIndex, node, columnIndex) {
                                 return rowIndex % 2 === 0 ? '#f3f3f3' :
-                                null; // Alterna colores de fondo para filas
+                                    null; // Alterna colores de fondo para filas
                             }
                         };
 

@@ -384,10 +384,10 @@
             try {
                 let paciente_id = $("#pacienteId").val() ? $("#pacienteId").val() : ''
                 let medicamento = $("#medicamento").val() ? $("#medicamento").val() : ''
-                let dosis_max = $("#dosis_max").val() ? $("#dosis_max").val() : ''
-                let dosis_administrada = $("#dosis_administrada").val() ? $("#dosis_administrada").val() : ''
+                let dosis_max = $("#dosisMaxima").val() ? $("#dosisMaxima").val() : ''
+                let dosis_administrada = $("#dosisAdministrada").val() ? $("#dosisAdministrada").val() : ''
                 //let servicio = $('input[name="servicio"]:checked').val();
-                let id_via_administracion = $("#id_via_administracion").val() ? $("#id_via_administracion").val() : ''
+                let id_via_administracion = $("#via").val() ? $("#via").val() : ''
                 let interacciones = $("#interacciones").val() ? $("#interacciones").val() : ''
                 let intervalo = $("#intervalo").val() ? $("#intervalo").val() : ''
                 let contraindicaciones = $("#contraindicaciones").val() ? $("#contraindicaciones").val() : ''
@@ -401,7 +401,7 @@
                 let anioTermino = $("#anioTermino").val() ? $("#anioTermino").val() : ''
                 let intervencion = $("#intervencion").val() ? $("#intervencion").val() : ''
                 let otros = $("#otros").val() ? $("#otros").val() : ''
-                let accion_tomada = $("#accion_tomada").val() ? $("#accion_tomada").val() : ''
+                let accion_tomada = $("#accionTomada").val() ? $("#accionTomada").val() : ''
                 let opcion_duplicidad = $('input[name="opcion_duplicidad"]:checked').val();
                 let opcion_intervencion = $('input[name="opcion_intervencion"]:checked').val();
                 let opcion_aceptacion = $('input[name="opcion_aceptacion"]:checked').val();
@@ -474,8 +474,8 @@
                 $("#anioTermino").val('')
                 $("#intervencion").val('')
                 $("#otros").val('')
-                $("#accion_tomada").val('')
-                $('#id_via_administracion').click(function() {
+                $("#accionTomada").val('')
+                $('#via').click(function() {
                     $('option:selected', this).remove();
                 });
                 $('#servicio').click(function() {
