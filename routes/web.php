@@ -36,7 +36,7 @@ Route::post('/actualizarPaciente', [App\Http\Controllers\HomeController::class, 
 Route::get('/reporteServicio', [App\Http\Controllers\HomeController::class, 'reporteServicio'])->name('reporteServicio');
 Route::post('/actualizarContra', [App\Http\Controllers\HomeController::class, 'actualizarContra'])->name('actualizarContra');
 
-Route::get('/filtro/{filtro}', [App\Http\Controllers\HomeController::class, 'filtro'])->name('filtro');
+Route::get('/filtro/{filtro}/{fecha}', [App\Http\Controllers\HomeController::class, 'filtro'])->name('filtro');
 
 
 

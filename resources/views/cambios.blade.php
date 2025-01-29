@@ -20,6 +20,7 @@
                     $mesActual = date("n");
                     $diaActual = date("j");
                     $añoActual = date("Y");
+                    $arrayMeses = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'] ;
                 @endphp
                     <div id="panelsStayOpen-ingresos" class="accordion-collapse collapse"
                         aria-labelledby="panelsStayOpen-headingTwo">
@@ -29,28 +30,15 @@
                                 <div class="form-group">
                                     <label for="fecha_ingreso">Fecha de Ingreso:</label>
                                     <div class="d-flex">
-                                        <select name="dia" id="dia" class="form-control" style="width: 25%;" readonly>
-                                            @for ($i = 1; $i <= 31; $i++)
-                                                <option value="{{ $i }}" value="{{ $i }}" {{ $i == ($diaActual ) ? 'selected' : '' }}>{{ $i }}</option>
-                                            @endfor
-                                        </select>
+                                            <input class="form-control" name="dia" id="dia" value="{{ $diaActual }}" readonly>
                                         @error('dia')
                                             <div class="alert alert-danger">{{ $message }}</div>
                                         @enderror
-                                        <select name="mes" id="mes" class="form-control mx-2"
-                                            style="width: 40%;" readonly>
-                                            @foreach (['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'] as $index => $mes)
-                                                <option value="{{ $index + 1 }}"  {{ ($index + 1) == $mesActual ? 'selected' : '' }}>{{ $mes }}</option>
-                                            @endforeach
-                                        </select>
+                                        <input class="form-control" name="mes" id="mes" type="text" class="form-control" value="{{$arrayMeses[$mesActual+1]}}" readonly>
                                         @error('mes')
                                             <div class="alert alert-danger">{{ $message }}</div>
                                         @enderror
-                                        <select name="anio" id="anio" class="form-control" style="width: 35%;" readonly>
-                                            @for ($i = date('Y') + 10; $i >= 1900; $i--)
-                                                <option value="{{ $i }}"  {{ $i == $añoActual ? 'selected' : '' }}>{{ $i }}</option>
-                                            @endfor
-                                        </select>
+                                        <input class="form-control" type="text" id="anio" name="anio" value="{{$añoActual}}" readonly>
                                         @error('anio')
                                             <div class="alert alert-danger">{{ $message }}</div>
                                         @enderror
@@ -67,7 +55,7 @@
                                     @enderror
                                 </div>
                                 <div class="row">
-                                    <div class="col-12 col-md-6">
+                                    <div class="col-12 col-md-6 d-none">
                                         <!-- Diagnóstico de Ingreso -->
                                         <div class="form-group">
                                             <label for="diagnostico_ingreso">Diagnóstico de Ingreso:</label>
@@ -95,6 +83,8 @@
                                             </div>
 
                                         </div>
+                                    </div>
+                                    <div class="col-12 col-md-6">
                                         <div class="row">
                                             <!-- Cama -->
                                             <div class="form-group">

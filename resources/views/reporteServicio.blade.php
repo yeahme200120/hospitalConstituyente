@@ -33,7 +33,7 @@
                             <td scope="row" style="background-color: #162f46; color: white; border-radius: 2rem;"
                                 class="text-center m-1 p-1">{{ $paciente->id }}</td>
                             <td scope="row" style="background-color: #162f46; color: white; border-radius: 2rem;"
-                                class="text-center m-1 p-1"><a onclick="filtrar({{$paciente->pacienteSQL}})"
+                                class="text-center m-1 p-1"><a onclick="filtrar({{$paciente}})"
                                     class="text-white">{{ $paciente->paciente }} </a></td>
                             <td scope="row" style="background-color: #162f46; color: white; border-radius: 2rem;"
                                 class="text-center m-1 p-1">{{ date($paciente->fecha) }}</td>
@@ -93,10 +93,12 @@
             let edad = (fecha.getFullYear() - año);
             $("#edad").val(edad);
         }
-        function filtrar(valor){
-            let filtro = valor;
-            console.log("Valor: ", filtro);
-            window.location.href = `/filtro/${filtro}`;
+        function filtrar(paciente){
+            console.log("Paceinte: ",paciente);
+            let filtro = paciente.pacienteSQL;
+            let fec = paciente.fecha;
+            console.log("Valor: ", filtro, "Fecha", fec);
+            window.location.href = `/filtro/${filtro}/${fec}`;
         }
     </script>
 @endsection

@@ -301,9 +301,9 @@ class HomeController extends Controller
         $hospitalizacion->diaInicio = $request->diaInicio;
         $hospitalizacion->mesInicio = $request->mesInicio;
         $hospitalizacion->anioInicio = $request->anioInicio;
-        $hospitalizacion->diaTermino = $request->diaTermino ? $request->diaTermino : null;
-        $hospitalizacion->mesTermino = $request->mesTermino ? $request->mesTermino : null;
-        $hospitalizacion->anioTermino = $request->anioTermino ? $request->anioTermino : null;
+        $hospitalizacion->diaTermino = $request->diaTermino ? $request->diaTermino : 0;
+        $hospitalizacion->mesTermino = $request->mesTermino ? $request->mesTermino : 0;
+        $hospitalizacion->anioTermino = $request->anioTermino ? $request->anioTermino : 0;
         $hospitalizacion->intervencion = $request->intervencion ? $request->intervencion : '';
         $hospitalizacion->otros = $request->otros ? $request->otros : '';
         $hospitalizacion->accion_tomada = $request->accionTomada ? $request->accionTomada : '';
@@ -333,9 +333,9 @@ class HomeController extends Controller
             $hospitalizacion->diaInicio = $request->diaInicio ? $request->diaInicio : '';
             $hospitalizacion->mesInicio = $request->mesInicio ? $request->mesInicio : '';
             $hospitalizacion->anioInicio = $request->anioInicio ? $request->anioInicio : '';
-            $hospitalizacion->diaTermino = $request->diaTermino ? $request->diaTermino : null;
-            $hospitalizacion->mesTermino = $request->mesTermino ? $request->mesTermino : null;
-            $hospitalizacion->anioTermino = $request->anioTermino ? $request->anioTermino : null;
+            $hospitalizacion->diaTermino = $request->diaTermino ? $request->diaTermino : 0;
+            $hospitalizacion->mesTermino = $request->mesTermino ? $request->mesTermino : 0;
+            $hospitalizacion->anioTermino = $request->anioTermino ? $request->anioTermino : 0;
             $hospitalizacion->opcion_duplicidad = !$request->opcion_duplicidad ? null : $request->opcion_duplicidad;
             $hospitalizacion->opcion_intervencion = !$request->opcion_intervencion ? null : $request->opcion_intervencion;
             $hospitalizacion->opcion_aceptacion = !$request->opcion_aceptacion ? null : $request->opcion_aceptacion;
@@ -397,7 +397,6 @@ class HomeController extends Controller
             //Campos del tratamiento
             'medicoTratante' => 'required',
             'diagnosticoAgregado' => 'required',
-            'diagnosticoEgreso' => 'required',
             'laboratorios' => 'required',
         ];
 
@@ -420,7 +419,6 @@ class HomeController extends Controller
 
             'medicoTratante.required' => 'El campo Delk medico tratante es un campo obligatorio,',
             'diagnosticoAgregado.required' => 'El campo del diagnostico agregado es un campo Obligatorio',
-            'diagnosticoEgreso.required' => "El campo de Diagnostico de egreso es un campo Obligatirio",
             'laboratorios.required' => "El campo de los laboratorios es un campo obligatorio"
 
         ];
@@ -489,12 +487,12 @@ class HomeController extends Controller
                         $hospitalizacion->contraindicaciones = $request->contraindicaciones ? $request->interacciones : '';
                         $hospitalizacion->horario = $request->horario ? $request->horario : '';
                         $hospitalizacion->recomendacion = $request->recomendacion ? $request->recomendacion : '';
-                        $hospitalizacion->diaInicio = $request->diaInicio ? $request->diaInicio : '';
-                        $hospitalizacion->mesInicio = $request->mesInicio ? $request->mesInicio : '';
-                        $hospitalizacion->anioInicio = $request->anioInicio ? $request->anioInicio : '';
-                        $hospitalizacion->diaTermino = $request->diaTermino ? $request->diaTermino : '';
-                        $hospitalizacion->mesTermino = $request->mesTermino ? $request->mesTermino : '';
-                        $hospitalizacion->anioTermino = $request->anioTermino ? $request->anioTermino : '';
+                        $hospitalizacion->diaInicio = $request->diaInicio ? $request->diaInicio : 0;
+                        $hospitalizacion->mesInicio = $request->mesInicio ? $request->mesInicio : 0;
+                        $hospitalizacion->anioInicio = $request->anioInicio ? $request->anioInicio : 0;
+                        $hospitalizacion->diaTermino = $request->diaTermino ? $request->diaTermino : 0;
+                        $hospitalizacion->mesTermino = $request->mesTermino ? $request->mesTermino : 0;
+                        $hospitalizacion->anioTermino = $request->anioTermino ? $request->anioTermino : 0;
                         $hospitalizacion->intervencion = $request->intervencion ? $request->intervencion : '';
                         $hospitalizacion->otros = $request->otros ? $request->otros : '';
                         $hospitalizacion->accion_tomada = $request->accionTomada ? $request->accionTomada : '';
@@ -646,8 +644,8 @@ class HomeController extends Controller
             }
         }
     }
-    public function filtro($filtro)
+    public function filtro($filtro,$fecha)
     {
-        return Excel::download(new HospitalizacionExport($filtro), 'Hospitalizaciones.xlsx');
+        return Excel::download(new HospitalizacionExport($filtro,$fecha), 'Hospitalizaciones.xlsx');
     }
 }

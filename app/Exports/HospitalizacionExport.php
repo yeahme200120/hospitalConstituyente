@@ -12,10 +12,12 @@ use Illuminate\Support\Facades\DB;
 class HospitalizacionExport implements FromCollection,WithHeadings
 {
     protected $pacienteId;
+    protected $fecha;
 
-    public function __construct($pacienteId)
+    public function __construct($pacienteId, $fech)
     {
         $this->pacienteId = $pacienteId;
+        $this->fecha = $fech;
     }
     /**
     * @return \Illuminate\Support\Collection
