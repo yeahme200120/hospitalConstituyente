@@ -7,7 +7,7 @@ use App\Models\Hospitalizacion;
 use App\Models\Ingresos;
 use App\Models\Pacientes;
 use App\Models\SignosVitales;
-use App\Models\Tratatamiento;
+use App\Models\Diagnosticos;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Date;
@@ -90,7 +90,7 @@ class ExportacionesController extends Controller
                             ->join("catalogo_servicios as servicio","servicio.id","=","ing.id_servicio")
                             ->join("catalogo_camas as camas","camas.id","=","ing.id_cama")
                             ->join("signos_vitales as signos","signos.paciente_id","=","pacientes.id")
-                            ->join("tratatamientos as tr","tr.paciente_id","=","pacientes.id")
+                            ->join("Diagnosticoss as tr","tr.paciente_id","=","pacientes.id")
                             ->join("catalogo_medicos as medico","medico.id","=","tr.id_medico")
                             ->where("hospital.fecha",">=",$fecha_inicio)
                             ->where("hospital.fecha","<=",$fecha_fin)
@@ -136,7 +136,7 @@ class ExportacionesController extends Controller
                                      ->orderByDesc("signos.created_at") // Tomar el último registro
                                      ->limit(1);
                             })
-                            ->leftJoin("tratatamientos as tr", function ($join) {
+                            ->leftJoin("Diagnosticoss as tr", function ($join) {
                                 $join->on("tr.paciente_id", "=", "pacientes.id")
                                      ->orderByDesc("tr.created_at") // Tomar el último tratamiento
                                      ->limit(1);

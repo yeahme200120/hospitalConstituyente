@@ -48,7 +48,7 @@
                                                         {{ old('medicoTratante') ? '' : 'selected' }}>Selecciona una
                                                         medico...</option>
                                                     @foreach ($medicos as $medico)
-                                                        <option value="{{ $medico->id }}">{{ $medico->nombre }}</option>
+                                                        <option value="{{ $medico->id }}">{{ $medico->nombre }} -- Cedula:  {{$medico->cedula}}</option>
                                                     @endforeach
                                                 </select>
                                                 @error('medicoTratante')
@@ -74,7 +74,7 @@
                                             <div class="col-sm-10">
                                                 <input type="text" class="form-control" id="diagnosticoEgreso"
                                                     name="diagnosticoEgreso" rows="2"
-                                                    value="{{ old('diagnosticoEgreso') }}" />
+                                                    value="{{ old('diagnosticoEgreso') }}" required />
                                                 @error('diagnosticoEgreso')
                                                     <div class="alert alert-danger">{{ $message }}</div>
                                                 @enderror
@@ -386,13 +386,9 @@
                 let medicamento = $("#medicamento").val() ? $("#medicamento").val() : ''
                 let dosis_max = $("#dosisMaxima").val() ? $("#dosisMaxima").val() : ''
                 let dosis_administrada = $("#dosisAdministrada").val() ? $("#dosisAdministrada").val() : ''
-                //let servicio = $('input[name="servicio"]:checked').val();
                 let id_via_administracion = $("#via").val() ? $("#via").val() : ''
-                let interacciones = $("#interacciones").val() ? $("#interacciones").val() : ''
                 let intervalo = $("#intervalo").val() ? $("#intervalo").val() : ''
-                let contraindicaciones = $("#contraindicaciones").val() ? $("#contraindicaciones").val() : ''
                 let horario = $("#horario").val() ? $("#horario").val() : ''
-                let recomendacion = $("#recomendacion").val() ? $("#recomendacion").val() : ''
                 let diaInicio = $("#diaInicio").val() ? $("#diaInicio").val() : ''
                 let mesInicio = $("#mesInicio").val() ? $("#mesInicio").val() : ''
                 let anioInicio = $("#anioInicio").val() ? $("#anioInicio").val() : ''
@@ -400,13 +396,11 @@
                 let mesTermino = $("#mesTermino").val() ? $("#mesTermino").val() : ''
                 let anioTermino = $("#anioTermino").val() ? $("#anioTermino").val() : ''
                 let intervencion = $("#intervencion").val() ? $("#intervencion").val() : ''
+                let interacciones = $("#interacciones").val() ? $("#interacciones").val() : ''
+                let contraindicaciones = $("#contraindicaciones").val() ? $("#contraindicaciones").val() : ''
+                let recomendacion = $("#recomendacion").val() ? $("#recomendacion").val() : ''
                 let otros = $("#otros").val() ? $("#otros").val() : ''
                 let accion_tomada = $("#accionTomada").val() ? $("#accionTomada").val() : ''
-                let opcion_duplicidad = $('input[name="opcion_duplicidad"]:checked').val();
-                let opcion_intervencion = $('input[name="opcion_intervencion"]:checked').val();
-                let opcion_aceptacion = $('input[name="opcion_aceptacion"]:checked').val();
-                let opcion_sin_cambios = $('input[name="opcion_sin_cambios"]:checked').val();
-
                 const token = '{{ csrf_token() }}';
 
                 let dataMedicamento = {
@@ -414,13 +408,9 @@
                     medicamento: medicamento ? medicamento : '',
                     dosis_max: dosis_max ? dosis_max : '',
                     dosis_administrada: dosis_administrada ? dosis_administrada : '',
-                    //servicio: servicio ? servicio : '',
                     id_via_administracion: id_via_administracion ? id_via_administracion : '',
-                    interacciones: interacciones ? interacciones : '',
                     intervalo: intervalo ? intervalo : '',
-                    contraindicaciones: contraindicaciones ? contraindicaciones : '',
                     horario: horario ? horario : '',
-                    recomendacion: recomendacion ? recomendacion : '',
                     diaInicio: diaInicio ? diaInicio : '',
                     mesInicio: mesInicio ? mesInicio : '',
                     anioInicio: anioInicio ? anioInicio : '',
@@ -428,12 +418,11 @@
                     mesTermino: mesTermino ? mesTermino : '',
                     anioTermino: anioTermino ? anioTermino : '',
                     intervencion: intervencion ? intervencion : '',
+                    interacciones: interacciones ? interacciones : '',
+                    contraindicaciones: contraindicaciones ? contraindicaciones : '',
+                    recomendacion: recomendacion ? recomendacion : '',
                     otros: otros ? otros : '',
                     accion_tomada: accion_tomada ? accion_tomada : '',
-                    opcion_duplicidad: opcion_duplicidad ? opcion_duplicidad : '',
-                    opcion_intervencion: opcion_intervencion ? opcion_intervencion : '',
-                    opcion_aceptacion: opcion_aceptacion ? opcion_aceptacion : '',
-                    opcion_sin_cambios: opcion_sin_cambios ? opcion_sin_cambios : '',
                     '_token': "{{ csrf_token() }}",
                 };
                 console.log("Datos del medicamento a registrar: ", dataMedicamento);
@@ -442,30 +431,31 @@
                     url: "{{ route('agregarMedicamento') }}",
                     data: dataMedicamento,
                     success: function(msg) {
-                        limpiarFormulario();
+                        console.log(msg);
+                        try {
+                            limpiarFormulario();
+                        } catch (error) {
+                            console.log("Error al limpiar el formulario", error);
+                            
+                        }
+                        
                     },
                     error: function(request, status, errorThrown) {
                         console.log(request, status, errorThrown);
-
                     }
                 });
             } catch (error) {
                 console.log("Error al generar la data");
-
             }
         }
          function limpiarFormulario() {
             console.log("Limpiando el formulario");
-            
             try {
                 $("#medicamento").val('')
                 $("#dosisMaxima").val('')
                 $("#dosisAdministrada").val('')
-                $("#interacciones").val('')
                 $("#intervalo").val('')
-                $("#contraindicaciones").val('')
                 $("#horario").val('')
-                $("#recomendacion").val('')
                 $("#diaInicio").val('')
                 $("#mesInicio").val('')
                 $("#anioInicio").val('')
@@ -473,30 +463,13 @@
                 $("#mesTermino").val('')
                 $("#anioTermino").val('')
                 $("#intervencion").val('')
+                $("#interacciones").val('')
+                $("#contraindicaciones").val('')
+                $("#recomendacion").val('')
                 $("#otros").val('')
                 $("#accionTomada").val('')
-                $('#via').click(function() {
-                    $('option:selected', this).remove();
-                });
-                $('#servicio').click(function() {
-                    $('option:selected', this).remove();
-                });
-                $('#opcion_duplicidad').click(function() {
-                    $('option:selected', this).remove();
-                });
-                $('#opcion_intervencion').click(function() {
-                    $('option:selected', this).remove();
-                });
-                $('#opcion_aceptacion').click(function() {
-                    $('option:selected', this).remove();
-                });
-                $('#opcion_sin_cambios').click(function() {
-                    $('option:selected', this).remove();
-                });
-                
             } catch (error) {
                 console.log("Error: ", error);
-                
             }
         }
     </script>

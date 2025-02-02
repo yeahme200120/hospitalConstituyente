@@ -15,13 +15,9 @@ return new class extends Migration
             $table->id();
             $table->integer("paciente_id");
             $table->string("medicamento");
-            $table->string("dosis_max",8,2);
+            $table->string("dosis_max");
             $table->string("dosis_administrada");
             $table->integer("id_via_administracion");
-            $table->string("opcion_duplicidad")->nullable();
-            $table->string("opcion_intervencion")->nullable();
-            $table->string("opcion_aceptacion")->nullable();
-            $table->string("opcion_sin_cambios")->nullable();
             $table->string("intervalo");
             $table->time("horario");
             $table->bigInteger("diaInicio");

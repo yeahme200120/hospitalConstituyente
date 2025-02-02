@@ -47,9 +47,11 @@
                                     </div>
                                     <div class="col-12 col-md-6">
                                         <div class="form-group">
-                                                <label for="id">  Id:</label>
-                                                <input type="text" id="id" name="id" class="form-control"
+                                                <label for="id">  Folio:</label>
+                                                <input type="hidden" id="id" name="id" class="form-control"
                                                     readonly value="{{$id}}">
+                                                <input type="text" id="id_paciente" name="id_paciente" class="form-control"
+                                                    readonly value="{{$id_pac}}">
                                                 @error('id')
                                                     <div class="alert alert-danger">{{ $message }}</div>
                                                 @enderror
@@ -172,7 +174,7 @@
                                             </div>
                                             <div class="col mt-1">
                                                 <input type="number" name="telefono" id="telefono" class="form-control"
-                                                    required value="{{old('telefono')}}" min="1111111111">
+                                                     value="{{old('telefono')}}" min="1111111111">
                                                 @error('telefono')
                                                     <div class="alert alert-danger">{{ $message }}</div>
                                                 @enderror
@@ -320,7 +322,7 @@
                                     <!-- Frecuencia Cardíaca -->
                                     <div class="col-md-6 form-group">
                                         <label for="frecuencia_cardiaca">Frecuencia Cardíaca:</label>
-                                        <input type="number" name="frecuencia_cardiaca" id="frecuencia_cardiaca"
+                                        <input type="text" name="frecuencia_cardiaca" id="frecuencia_cardiaca"
                                             class="form-control" placeholder="Latidos por minuto" value="{{old('frecuencia_cardiaca')}}">
                                         @error('frecuencia_cardiaca')
                                             <div class="alert alert-danger">{{ $message }}</div>
@@ -340,7 +342,7 @@
                                     <!-- Temperatura -->
                                     <div class="col-md-6 form-group">
                                         <label for="temperatura">Temperatura:</label>
-                                        <input type="number" name="temperatura" id="temperatura" class="form-control"
+                                        <input type="text" name="temperatura" id="temperatura" class="form-control"
                                             placeholder="En grados Celsius" value="{{old('temperatura')}}">
                                         @error('temperatura')
                                             <div class="alert alert-danger">{{ $message }}</div>
@@ -350,7 +352,7 @@
                                     <!-- Frecuencia Respiratoria -->
                                     <div class="col-md-6 form-group">
                                         <label for="frecuencia_respiratoria">Frecuencia Respiratoria:</label>
-                                        <input type="number" name="frecuencia_respiratoria" id="frecuencia_respiratoria"
+                                        <input type="text" name="frecuencia_respiratoria" id="frecuencia_respiratoria"
                                             class="form-control" placeholder="Respiraciones por minuto" value="{{old('frecuencia_respiratoria')}}">
                                         @error('frecuencia_respiratoria')
                                             <div class="alert alert-danger">{{ $message }}</div>
@@ -360,7 +362,7 @@
                                     <!-- Oxigenación -->
                                     <div class="col-md-6 form-group">
                                         <label for="oxigenacion">Oxigenación:</label>
-                                        <input type="number" name="oxigenacion" id="oxigenacion" class="form-control"
+                                        <input type="text" name="oxigenacion" id="oxigenacion" class="form-control"
                                             placeholder="Porcentaje de oxígeno" value="{{old('oxigenacion')}}">
                                         @error('oxigenacion')
                                             <div class="alert alert-danger">{{ $message }}</div>
@@ -370,7 +372,7 @@
                                     <!-- Peso -->
                                     <div class="col-md-6 form-group">
                                         <label for="peso">Peso:</label>
-                                        <input type="number" name="peso" id="peso" class="form-control"
+                                        <input type="text" name="peso" id="peso" class="form-control"
                                             placeholder="En kilogramos" value="{{old('peso')}}">
                                         @error('peso')
                                             <div class="alert alert-danger">{{ $message }}</div>
@@ -380,7 +382,7 @@
                                     <!-- Talla -->
                                     <div class="col-md-6 form-group">
                                         <label for="talla">Talla:</label>
-                                        <input type="number" name="talla" id="talla" class="form-control"
+                                        <input type="text" name="talla" id="talla" class="form-control"
                                             placeholder="En centímetros" value="{{old('talla')}}">
                                         @error('talla')
                                             <div class="alert alert-danger">{{ $message }}</div>
@@ -432,6 +434,7 @@
         function llenarDatos() {
         const selectedValue = $('#pacientesSelect').val();  
         let paciente = JSON.parse(selectedValue);
+        
         let nombre = $("#nombre").val(paciente.nombre);
         let fecha_nac_dia = $("#fecha_nac_dia").val(paciente.fecha_nac_dia);
         let fecha_nac_mes = $("#fecha_nac_mes").val(paciente.fecha_nac_mes);
@@ -441,7 +444,8 @@
         let enfermedades_cronicas = $("#enfermedades_cronicas").val(paciente.enfermedades_cronicas);
         let telefono = $("#telefono").val(paciente.telefono);
         let alergias = $("#alergias").val(paciente.alergias);
-        let id = $("#id").val(paciente.id_paciente);
+        let id = $("#id").val(paciente.id);
+        let id_paciente = $("#id_paciente").val(paciente.id_paciente);
     }
     </script>
 @endsection

@@ -2,7 +2,7 @@
 
 namespace App\Exports;
 
-use App\Models\Tratatamiento;
+use App\Models\Diagnosticos;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 
@@ -13,7 +13,7 @@ class TratamientoExport implements FromCollection
     */
     public function collection()
     {
-        return Tratatamiento::select(
+        return Diagnosticos::select(
             "paciente_id",
             "id_medico",
             "diagnostico_agregado",

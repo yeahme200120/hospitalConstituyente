@@ -17,14 +17,15 @@
                         aria-labelledby="panelsStayOpen-headingOne">
                         <div class="card">
                             <div class="card-body">
-                                <input class="form-control" type="hidden" name="id_hospital" value="{{$id_hospital}}">
+                                {{-- Campos importantes de ids --}}
+                                <input class="form-control" type="hidden" name="id_hospital" id="id_hospital" value="{{$id_hospital}}">
+                                <input class="form-control" type="hidden" id="Id" name="Id" value="{{$paciente->id}}">
                                 <!-- Nombre completo -->
                                 <div class="form-group">
                                     <label for="nombre">Nombre completo:</label>
                                     <input type="text" name="nombre" id="nombre" class="form-control"
                                         value="{{ $paciente->nombre }}">
                                 </div>
-                                <input class="form-control" type="hidden" id="Id" name="Id" value="{{$paciente->id}}">
                                 <div class="row p-2">
                                     <div class="col-12 col-md-8">
                                         <div class="row justify-content-md-center">
@@ -79,12 +80,11 @@
                                                     +
                                                     +tion>
                                                 </select>
-
                                                 <select name="fecha_nac_año" id="fecha_nac_año" class="form-control"
                                                     style="width: 35%;" onchange="calculaEdad()">
                                                     @for ($i = date('Y') + 10; $i >= 1900; $i--)
                                                         <option value="{{ $i }}"
-                                                            {{ $i == $añoActual ? 'selected' : '' }}>
+                                                            {{ $i == $paciente->fecha_nac_año ? 'selected' : '' }}>
                                                             {{ $i }}
                                                         </option>
                                                     @endfor
@@ -119,7 +119,7 @@
                                             </div>
                                             <div class="col">
                                                 <select name="genero" id="genero" class="form-control">
-                                                    <option value="" @if($paciente->genero != "Hombre" && $paciente->genero != "Mujer" || $paciente->genero == "" ) selected @endif>Sin genero registrado</option>
+                                                    <option value="" @if($paciente->genero != "Hombre" && $paciente->genero != "Mujer" || $paciente->genero == "" ) selected @endif disabled>Sin genero registrado</option>
                                                     <option value="Hombre" @if($paciente->genero == "Hombre") selected @endif>Hombre</option>
                                                     <option value="Mujer" @if($paciente->genero == "Mujer") selected @endif>Mujer</option>
                                                     </select>

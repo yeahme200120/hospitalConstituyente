@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Tratatamiento extends Model
+class Diagnosticos extends Model
 {
     protected $fillable = [
         "paciente_id",

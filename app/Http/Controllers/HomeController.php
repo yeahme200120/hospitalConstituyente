@@ -18,7 +18,7 @@ use App\Models\Ingresos;
 use App\Models\Pacientes;
 use App\Models\SignosVitales;
 use App\Models\tablaHospital;
-use App\Models\Tratatamiento;
+use App\Models\Diagnosticos;
 use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Support\Facades\Hash;
@@ -56,27 +56,30 @@ class HomeController extends Controller
     }
     public function seguimiento()
     {
-        $ultimoId = Pacientes::max('id_paciente');
+        $ultimoIdPac = Pacientes::max('id_paciente');
+        $id_pac = $ultimoIdPac + 1;
+        $ultimoId = Pacientes::max('id');
         $id = $ultimoId + 1;
         //Seccion de los catalogos a mostrar
         $enfermedades = CatalogoEnfermedadesCronicas::all();
         $servicios = CatalogoServicios::all();
         $camas = CatalogoCamas::all();
         $pacientes = Pacientes::all();
-        return view("seguimiento", compact("pacientes", "id", "enfermedades", "servicios", "camas"));
+        return view("seguimiento", compact("pacientes", "id", "id_pac", "enfermedades", "servicios", "camas"));
     }
     public function registrarSeguimiento(Request $request)
     {
         $rules = [
             'nombre' => 'required',
             'id' => 'required',
+            'id_paciente' => 'required',
             'fecha_nac_dia' => 'required',
             'fecha_nac_mes' => 'required',
             'fecha_nac_año' => 'required',
             'edad' => 'required',
             'genero' => 'required',
             'enfermedades_cronicas' => 'required',
-            'telefono' => 'required',
+            //'telefono' => 'required', Campo telefono no requerido
             'alergias' => 'required',
 
             'dia' => 'required',
@@ -98,14 +101,15 @@ class HomeController extends Controller
 
         $messages = [
             'nombre.required' => 'El campo nombre es obligatorio.',
-            'id.required' => 'El campo Id del paciete no puede estar vacio y es obligatorio.',
+            'id.required' => 'El campo Id del Paciete no puede estar vacio y es obligatorio.',
+            'id_paciente.required' => 'El campo del Paciente no puede estar vacio y es obligatorio.',
             'fecha_nac_dia.required' => 'El campo día de nacimiento es obligatorio.',
             'fecha_nac_mes.required' => 'El campo mes de nacimiento es obligatorio.',
             'fecha_nac_año.required' => 'El campo año de nacimiento es obligatorio.',
             'edad.required' => 'El campo edad es obligatorio.',
             'genero.required' => 'El campo género es obligatorio.',
             'enfermedades_cronicas.required' => 'El campo enfermedades crónicas es obligatorio.',
-            'telefono.required' => 'El campo teléfono es obligatorio.',
+            //'telefono.required' => 'El campo teléfono es obligatorio.', Telefono no obligatorio
             'alergias.required' => 'El campo alergias es obligatorio.',
 
             'dia.required' => 'El campo día es obligatorio.',
@@ -131,27 +135,21 @@ class HomeController extends Controller
 
         $paciente = Pacientes::updateOrCreate(
             // Condición para buscar el registro existente
-            ['id_paciente' => $request->id],
+            ['id' => $request->id],
             // Datos para actualizar o crear
             [
                 'nombre' => $request->nombre,
+                'id_paciente' => $request->id_paciente,
+                'telefono' => $request->telefono ? $request->telefono : '',  //Campo no obligatorio
                 'fecha_nac_dia' => $request->fecha_nac_dia,
                 'fecha_nac_mes' => $request->fecha_nac_mes,
                 'fecha_nac_año' => $request->fecha_nac_año,
                 'edad' => $request->edad,
                 'genero' => $request->genero,
                 'id_enfermedad_cronica' => json_encode($request->enfermedades_cronicas),
-                'telefono' => $request->telefono,
                 'alergias' => $request->alergias,
             ]
         );
-
-        // Respuesta para indicar éxito o fallo
-        if ($paciente->wasRecentlyCreated) {
-            array_push($respuesta, ["paciente" => 1, "mensaje" => "Paciente creado exitosamente."]);
-        } else {
-            array_push($respuesta, ["paciente" => 1, "mensaje" => "Paciente actualizado exitosamente."]);
-        }
 
         //Registro de ingresos
         $ingreso = new Ingresos();
@@ -165,48 +163,53 @@ class HomeController extends Controller
         $ingreso->id_cama = $request->cama;
 
         if ($ingreso->save()) {
-            array_push($respuesta, ["ingreso" => 1]);
+            //Si se guardo correctamente los ingresos
+            try {
+                //Se genera el registro para en hospital
+                $serv = CatalogoServicios::find($request->servicio);
+                $ca = CatalogoCamas::find($request->cama);
+                $tabla = new tablaHospital();
+                $tabla->paciente =  $request->nombre;
+                $tabla->id_paciente = $request->id;
+                $tabla->fecha =  date(now());
+                $tabla->hora =  date("H:i:s");
+                $tabla->servicio =  $serv->servicio;
+                $tabla->id_servicio =  $serv->id;
+                $tabla->estatus =  "Activo";
+                $tabla->id_estatus =  1;
+                $tabla->cama =  $ca->cama;
+                $tabla->id_cama =  $ca->id;
+                if ($tabla->save()) {
+                    //Si todo Ok
+                    //Registro de signos vitales en caso de nulos se registra de igualmanera
+                    $signos = new SignosVitales();
+                    $signos->paciente_id = $paciente->id;
+                    $signos->frecuencia_cardiaca = $request->frecuencia_cardiaca ?  $request->frecuencia_cardiaca : '';
+                    $signos->tension_arterial = $request->tension_arterial ? $request->tension_arterial : '';
+                    $signos->temperatura = $request->temperatura ? $request->temperatura : '';
+                    $signos->frecuencia_respiratoria = $request->frecuencia_respiratoria ? $request->frecuencia_respiratoria : '';
+                    $signos->oxigenacion = $request->oxigenacion ? $request->oxigenacion : '';
+                    $signos->peso = $request->peso ? $request->peso : '';
+                    $signos->talla = $request->talla ?  $request->talla : '';
+
+                    if ($signos->save()) {
+                        return redirect()->route('seguimientoTratamiento', ['paciente' => $paciente->id])
+                            ->with('success', 'Registro correcto de Informacion personal, Ingresos y Signos Vitales');
+                    } else {
+                        return redirect()->back()->withErrors(['error' => "Error al generar el registro en Signos Vitales"]);
+                    }
+                } else {
+                }
+            } catch (\Throwable $th) {
+                return redirect()->back()->withErrors(['error' => "Error al registrar el registro en Hospitalización"]);
+            }
         } else {
-            array_push($respuesta, ["ingreso" => 0]);
-        }
-
-        //Se genera el registro para en hospital
-        $serv = CatalogoServicios::find($request->servicio);
-        $ca = CatalogoCamas::find($request->cama);
-        $tabla = new tablaHospital();
-        $tabla->paciente =  $request->nombre;
-        $tabla->id_paciente = $request->id;
-        $tabla->fecha =  date(now());
-        $tabla->hora =  date("H:i:s");
-        $tabla->servicio =  $serv->servicio;
-        $tabla->id_servicio =  $serv->id;
-        $tabla->estatus =  "Activo";
-        $tabla->id_estatus =  1;
-        $tabla->cama =  $ca->cama;
-        $tabla->id_cama =  $ca->id;
-        $tabla->save();
-
-        //Registro de signos vitales
-        $signos = new SignosVitales();
-        $signos->paciente_id = $paciente->id;
-        $signos->frecuencia_cardiaca = $request->frecuencia_cardiaca;
-        $signos->tension_arterial = $request->tension_arterial;
-        $signos->temperatura = $request->temperatura;
-        $signos->frecuencia_respiratoria = $request->frecuencia_respiratoria;
-        $signos->oxigenacion = $request->oxigenacion;
-        $signos->peso = $request->peso;
-        $signos->talla = $request->talla;
-
-        if ($signos->save()) {
-            return redirect()->route('seguimientoTratamiento', ['paciente' => $paciente->id])
-                ->with('success', 'Registro correcto de Informacion personal, Ingresos y Signos Vitales');
-        } else {
-            return 0;
+            return redirect()->back()->withErrors(['error' => "Error al registrar el registro en Ingresos"]);
         }
     }
     public function enHospital(Request $request)
     {
-        $hospitalizados = tablaHospital::where("id_Estatus", "=", 1)->orderBy('fecha', 'desc')->get();
+        $hospitalizados = tablaHospital::where("id_estatus", "=", 1)->orderBy('fecha', 'desc')->get();
         return view("enHospital", compact("hospitalizados"));
     }
     public function reporteServicio(Request $request)
@@ -242,6 +245,7 @@ class HomeController extends Controller
             'pacienteId' => 'required',
             'medicoTratante' => 'required',
             'diagnosticoAgregado' => 'required',
+            'diagnosticoEgreso' => 'required',
             'laboratorios' => 'required',
             'medicamento' => 'required',
             'dosisMaxima' => 'required',
@@ -258,6 +262,7 @@ class HomeController extends Controller
             'pacienteId.required' => 'El campo Paciente es un campo obligatorio.',
             'medicoTratante.required' => 'El campo Medico tratante es un campo obligatorio.',
             'diagnosticoAgregado.required' => 'El campo diagnostico agregado es un campo obligatorio.',
+            'diagnosticoEgreso.required' => 'El campo diagnostico de egreso es un campo obligatorio en caso de no tenerlo ingrese N/A.',
             'laboratorios.required' => 'El campo Laboratorios es un campo obligatorio.',
             'medicamento.required' => 'El campo Medicamento es un campo obligatorio.',
             'dosisMaxima.required' => 'El campo Dosis maxima es un campo obligatorio.',
@@ -273,49 +278,50 @@ class HomeController extends Controller
         $this->validate($request, $rules, $messages);
 
         //Registro de Tratamiento
-        $tratamiento = new Tratatamiento();
-        $tratamiento->paciente_id = $request->pacienteId;
-        $tratamiento->id_medico = $request->medicoTratante;
-        $tratamiento->diagnostico_agregado = $request->diagnosticoAgregado;
-        $tratamiento->diagnostico_egreso = !$request->diagnosticoEgreso ? '' : $request->diagnosticoEgreso;
-        $tratamiento->laboratorios = $request->laboratorios;
+        try {
+            $tratamiento = new Diagnosticos();
+            $tratamiento->paciente_id = $request->pacienteId;
+            $tratamiento->id_medico = $request->medicoTratante ? $request->medicoTratante : 0;
+            $tratamiento->diagnostico_agregado = $request->diagnosticoAgregado ? $request->diagnosticoAgregado : '';
+            $tratamiento->diagnostico_egreso = !$request->diagnosticoEgreso ? '' : $request->diagnosticoEgreso;
+            $tratamiento->laboratorios = $request->laboratorios ? $request->laboratorios : '';
+            if ($tratamiento->save()) {
+                //Si registro tratamientos todo Ok
+                //Registro de Hospitalización
+                try {
+                    $hospitalizacion = new Hospitalizacion();
+                    $hospitalizacion->paciente_id = $request->pacienteId;
+                    $hospitalizacion->medicamento = $request->medicamento ? $request->medicamento : '';
+                    $hospitalizacion->dosis_max = $request->dosisMaxima ? $request->dosisMaxima : '';
+                    $hospitalizacion->dosis_administrada = $request->dosisAdministrada ? $request->dosisAdministrada : '';
+                    $hospitalizacion->id_via_administracion = $request->via ? $request->via : 0;
+                    $hospitalizacion->interacciones = $request->interacciones ? $request->interacciones : '';
+                    $hospitalizacion->intervalo = $request->intervalo ? $request->intervalo : '';
+                    $hospitalizacion->contraindicaciones = $request->contraindicaciones ? $request->interacciones : '';
+                    $hospitalizacion->horario = $request->horario ? $request->horario : '';
+                    $hospitalizacion->recomendacion = $request->recomendacion ? $request->recomendacion : '';
+                    $hospitalizacion->diaInicio = $request->diaInicio ? $request->diaInicio : '';
+                    $hospitalizacion->mesInicio = $request->mesInicio ? $request->mesInicio : '';
+                    $hospitalizacion->anioInicio = $request->anioInicio ? $request->anioInicio : '';
+                    $hospitalizacion->diaTermino = $request->diaTermino ? $request->diaTermino : 0;
+                    $hospitalizacion->mesTermino = $request->mesTermino ? $request->mesTermino : 0;
+                    $hospitalizacion->anioTermino = $request->anioTermino ? $request->anioTermino : 0;
+                    $hospitalizacion->intervencion = $request->intervencion ? $request->intervencion : '';
+                    $hospitalizacion->otros = $request->otros ? $request->otros : '';
+                    $hospitalizacion->accion_tomada = $request->accionTomada ? $request->accionTomada : '';
+                    $hospitalizacion->estatus = 1;
 
-        if ($tratamiento->save()) {
-            array_push($respuesta, ["tratamiento" => 1]);
-        } else {
-            array_push($respuesta, ["tratamiento" => 0]);
-        }
-
-        //Registro de Hospitalización
-        $hospitalizacion = new Hospitalizacion();
-        $hospitalizacion->paciente_id = $request->pacienteId;
-        $hospitalizacion->medicamento = $request->medicamento;
-        $hospitalizacion->dosis_max = $request->dosisMaxima;
-        $hospitalizacion->dosis_administrada = $request->dosisAdministrada;
-        $hospitalizacion->id_via_administracion = $request->via;
-        $hospitalizacion->interacciones = $request->interacciones ? $request->interacciones : '';
-        $hospitalizacion->intervalo = $request->intervalo;
-        $hospitalizacion->contraindicaciones = $request->contraindicaciones ? $request->interacciones : '';
-        $hospitalizacion->horario = $request->horario;
-        $hospitalizacion->recomendacion = $request->recomendacion ? $request->recomendacion : '';
-        $hospitalizacion->diaInicio = $request->diaInicio;
-        $hospitalizacion->mesInicio = $request->mesInicio;
-        $hospitalizacion->anioInicio = $request->anioInicio;
-        $hospitalizacion->diaTermino = $request->diaTermino ? $request->diaTermino : 0;
-        $hospitalizacion->mesTermino = $request->mesTermino ? $request->mesTermino : 0;
-        $hospitalizacion->anioTermino = $request->anioTermino ? $request->anioTermino : 0;
-        $hospitalizacion->intervencion = $request->intervencion ? $request->intervencion : '';
-        $hospitalizacion->otros = $request->otros ? $request->otros : '';
-        $hospitalizacion->accion_tomada = $request->accionTomada ? $request->accionTomada : '';
-        $hospitalizacion->opcion_duplicidad = !$request->opcion_duplicidad ? null : $request->opcion_duplicidad;
-        $hospitalizacion->opcion_intervencion = !$request->opcion_intervencion ? null : $request->opcion_intervencion;
-        $hospitalizacion->opcion_aceptacion = !$request->opcion_aceptacion ? null : $request->opcion_aceptacion;
-        $hospitalizacion->opcion_sin_cambios = !$request->opcion_sin_cambios ? null : $request->opcion_sin_cambios;
-        $hospitalizacion->estatus = 1;
-
-        if ($hospitalizacion->save()) {
-            array_push($respuesta, ["hospitalizacion" => 1]);
-            return redirect()->route('enHospital')->with('success', 'Registro correcto de Tratamiento y hospitalización');
+                    if ($hospitalizacion->save()) {
+                        return redirect()->route('enHospital')->with('success', 'Registro correcto de Tratamiento y hospitalización');
+                    }
+                } catch (\Throwable $th) {
+                    return redirect()->back()->withErrors(['error' => "Error al generar el registro en Hospitalización"]);
+                }
+            } else {
+                return redirect()->back()->withErrors(['error' => "Error al generar el registro en Hospitalización"]);
+            }
+        } catch (\Throwable $th) {
+            return redirect()->back()->withErrors(['error' => "Error al generar el registro en Trtatamientos"]);
         }
     }
     public function agregarMedicamento2(Request $request)
@@ -336,10 +342,6 @@ class HomeController extends Controller
             $hospitalizacion->diaTermino = $request->diaTermino ? $request->diaTermino : 0;
             $hospitalizacion->mesTermino = $request->mesTermino ? $request->mesTermino : 0;
             $hospitalizacion->anioTermino = $request->anioTermino ? $request->anioTermino : 0;
-            $hospitalizacion->opcion_duplicidad = !$request->opcion_duplicidad ? null : $request->opcion_duplicidad;
-            $hospitalizacion->opcion_intervencion = !$request->opcion_intervencion ? null : $request->opcion_intervencion;
-            $hospitalizacion->opcion_aceptacion = !$request->opcion_aceptacion ? null : $request->opcion_aceptacion;
-            $hospitalizacion->opcion_sin_cambios = !$request->opcion_sin_cambios ? 'Sin Cambios' : $request->opcion_sin_cambios;
             $hospitalizacion->estatus = 1;
             $hospitalizacion->interacciones = $request->interacciones ? $request->interacciones : '';
             $hospitalizacion->contraindicaciones = $request->contraindicaciones ? $request->contraindicaciones : '';
@@ -360,13 +362,14 @@ class HomeController extends Controller
     }
     public function cambios($paciente_id, $id_hospital)
     {
+        //Paciente_id es el id real del paciente unico
         //Seccion de los
-        $pacientes = Pacientes::where("id_paciente", "=", $paciente_id)->first();
+        $pacientes = Pacientes::find($paciente_id);
         $hospitalizacion = Hospitalizacion::where("paciente_id", "=", $pacientes->id)->first();
         $tabla = tablaHospital::find($id_hospital);
         $ingresos = Ingresos::where('paciente_id', '=', $pacientes->id)->first();
         $signos = SignosVitales::where('paciente_id', '=', $pacientes->id)->first();
-        $tratamiento = Tratatamiento::where("paciente_id", "=", $pacientes->id)->first();
+        $tratamiento = Diagnosticos::where("paciente_id", "=", $pacientes->id)->first();
         $enfermedades = CatalogoEnfermedadesCronicas::all();
         $servicios = CatalogoServicios::all();
         $camas = CatalogoCamas::all();
@@ -398,6 +401,17 @@ class HomeController extends Controller
             'medicoTratante' => 'required',
             'diagnosticoAgregado' => 'required',
             'laboratorios' => 'required',
+
+            //Campos obligatorios del medicamento
+            'medicamento' => 'required',
+            'dosisMaxima' => 'required',
+            'dosisAdministrada' => 'required',
+            'via' => 'required',
+            'intervalo' => 'required',
+            'horario' => 'required',
+            'diaInicio' => 'required',
+            'mesInicio' => 'required',
+            'anioInicio' => 'required',
         ];
 
         $messages = [
@@ -419,104 +433,122 @@ class HomeController extends Controller
 
             'medicoTratante.required' => 'El campo Delk medico tratante es un campo obligatorio,',
             'diagnosticoAgregado.required' => 'El campo del diagnostico agregado es un campo Obligatorio',
-            'laboratorios.required' => "El campo de los laboratorios es un campo obligatorio"
+            'laboratorios.required' => "El campo de los laboratorios es un campo obligatorio",
 
+            'medicamento.required' => 'El campo Medicamento es un campo Obligatorio',
+            'dosisMaxima.required' => 'El campo Dosis Maxima es un campo Obligatorio',
+            'dosisAdministrada.required' => 'El campo Dosis Administrada es un campo Obligatorio',
+            'via.required' => 'El campo Via de Administración es un campo Obligatorio',
+            'intervalo.required' => 'El campo Intervalo es un campo Obligatorio',
+            'horario.required' => 'El campo Horario es un campo Obligatorio',
+            'diaInicio.required' => 'El campo Dia de inicio es un campo Obligatorio',
+            'mesInicio.required' => 'El campo Mes de inicio es un campo Obligatorio',
+            'anioInicio.required' => 'El campo Año de inicio es un campo Obligatorio',
         ];
         $respuesta = [];
         $this->validate($request, $rules, $messages);
         $paciente = Pacientes::find($request->paciente_id);
 
         //Registro de ingresos
-        $ingreso = new Ingresos();
-        $ingreso->paciente_id = $paciente->id;
-        $ingreso->ingreso_dia = $request->dia;
-        $ingreso->ingreso_mes = $request->mes;
-        $ingreso->ingreso_año = $request->anio;
-        $ingreso->ingreso_hora = $request->hora_ingreso;
-        $ingreso->diagnostico = $request->diagnostico_ingreso;
-        $ingreso->id_servicio = $request->servicio;
-        $ingreso->id_cama = $request->cama;
+        try {
+            $ingreso = new Ingresos();
+            $ingreso->paciente_id = $paciente->id;
+            $ingreso->ingreso_dia = $request->dia ? $request->dia : 0;
+            $ingreso->ingreso_mes = $request->mes ? $request->mes : 0;
+            $ingreso->ingreso_año = $request->anio ? $request->anio : 0;
+            $ingreso->ingreso_hora = $request->hora_ingreso ? $request->hora_ingreso : '';
+            $ingreso->diagnostico = $request->diagnostico_ingreso ? $request->diagnostico_ingreso : '';
+            $ingreso->id_servicio = $request->servicio ? $request->servicio : 0;
+            $ingreso->id_cama =  $request->cama ? $request->cama : 0;
+            if ($ingreso->save()) {
+                try {
+                    //Se genera el registro para en hospital
+                    $serv = CatalogoServicios::find($request->servicio);
+                    $ca = CatalogoCamas::find($request->cama);
+                    $tabla = new tablaHospital();
+                    $tabla->paciente =  $paciente->nombre ? $paciente->nombre : '';
+                    $tabla->id_paciente = $paciente->id ? $paciente->id : 0;
+                    $tabla->fecha =  date(now());
+                    $tabla->hora =  date("H:i:s");
+                    $tabla->servicio =  $serv->servicio ? $serv->servicio : '';
+                    $tabla->id_servicio =  $serv->id ? $serv->id : 0;
+                    $tabla->estatus =  "Activo";
+                    $tabla->id_estatus =  1;
+                    $tabla->cama =  $ca->cama ? $ca->cama : '';
+                    $tabla->id_cama =  $ca->id ? $ca->id : 0;
 
-        //Se genera el registro para en hospital
-        $serv = CatalogoServicios::find($request->servicio);
-        $ca = CatalogoCamas::find($request->cama);
+                    if ($tabla->save()) {
+                        //Registro de signos vitales
+                        $signos = new SignosVitales();
+                        $signos->paciente_id = $paciente->id ? $paciente->id :0;
+                        $signos->frecuencia_cardiaca = $request->frecuencia_cardiaca ? $request->frecuencia_cardiaca :'';
+                        $signos->tension_arterial = $request->tension_arterial ? $request->tension_arterial :'';
+                        $signos->temperatura = $request->temperatura ? $request->temperatura :'';
+                        $signos->frecuencia_respiratoria = $request->frecuencia_respiratoria ? $request->frecuencia_respiratoria :'';
+                        $signos->oxigenacion = $request->oxigenacion ? $request->oxigenacion :'';
+                        $signos->peso = $request->peso ? $request->peso :'';
+                        $signos->talla = $request->talla ? $request->talla :'';
 
-        $tabla = new tablaHospital();
-        $tabla->paciente =  $paciente->nombre;
-        $tabla->id_paciente = $paciente->id_paciente;
-        $tabla->fecha =  date(now());
-        $tabla->hora =  date("H:i:s");
-        $tabla->servicio =  $serv->servicio;
-        $tabla->id_servicio =  $serv->id;
-        $tabla->estatus =  "Activo";
-        $tabla->id_estatus =  1;
-        $tabla->cama =  $ca->cama;
-        $tabla->id_cama =  $ca->id;
-        $tabla->save();
+                        if ($signos->save()) {
+                            try {
+                                //Registro de Tratamiento
+                                $tratamiento = new Diagnosticos();
+                                $tratamiento->paciente_id = $paciente->id;
+                                $tratamiento->id_medico = $request->medicoTratante ? $request->medicoTratante : 0;
+                                $tratamiento->diagnostico_agregado = $request->diagnosticoAgregado ? $request->diagnosticoAgregado : '';
+                                $tratamiento->diagnostico_egreso = !$request->diagnosticoEgreso ? '' : $request->diagnosticoEgreso;
+                                $tratamiento->laboratorios = $request->laboratorios ? $request->laboratorios : '';
+                                if ($tratamiento->save()) {
+                                    try {
+                                        $hospitalizacion = new Hospitalizacion();
+                                        $hospitalizacion->paciente_id = $paciente->id;
+                                        $hospitalizacion->medicamento = $request->medicamento ? $request->medicamento : '';
+                                        $hospitalizacion->dosis_max = $request->dosisMaxima ? $request->dosisMaxima : '';
+                                        $hospitalizacion->dosis_administrada = $request->dosisAdministrada ? $request->dosisAdministrada : '';
+                                        $hospitalizacion->id_via_administracion = $request->via ? $request->via : 0;
+                                        $hospitalizacion->interacciones = $request->interacciones ? $request->interacciones : '';
+                                        $hospitalizacion->intervalo = $request->intervalo ? $request->intervalo : '';
+                                        $hospitalizacion->contraindicaciones = $request->contraindicaciones ? $request->interacciones : '';
+                                        $hospitalizacion->horario = $request->horario ? $request->horario : '';
+                                        $hospitalizacion->recomendacion = $request->recomendacion ? $request->recomendacion : '';
+                                        $hospitalizacion->diaInicio = $request->diaInicio ? $request->diaInicio : 0;
+                                        $hospitalizacion->mesInicio = $request->mesInicio ? $request->mesInicio : 0;
+                                        $hospitalizacion->anioInicio = $request->anioInicio ? $request->anioInicio : 0;
+                                        $hospitalizacion->diaTermino = $request->diaTermino ? $request->diaTermino : 0;
+                                        $hospitalizacion->mesTermino = $request->mesTermino ? $request->mesTermino : 0;
+                                        $hospitalizacion->anioTermino = $request->anioTermino ? $request->anioTermino : 0;
+                                        $hospitalizacion->intervencion = $request->intervencion ? $request->intervencion : '';
+                                        $hospitalizacion->otros = $request->otros ? $request->otros : '';
+                                        $hospitalizacion->accion_tomada = $request->accionTomada ? $request->accionTomada : '';
 
-        //Registro de signos vitales
-        $signos = new SignosVitales();
-        $signos->paciente_id = $paciente->id;
-        $signos->frecuencia_cardiaca = $request->frecuencia_cardiaca;
-        $signos->tension_arterial = $request->tension_arterial;
-        $signos->temperatura = $request->temperatura;
-        $signos->frecuencia_respiratoria = $request->frecuencia_respiratoria;
-        $signos->oxigenacion = $request->oxigenacion;
-        $signos->peso = $request->peso;
-        $signos->talla = $request->talla;
-
-        if ($signos->save()) {
-            try {
-                //Registro de Tratamiento
-                $tratamiento = new Tratatamiento();
-                $tratamiento->paciente_id = $paciente->id;
-                $tratamiento->id_medico = $request->medicoTratante ? $request->medicoTratante : '';
-                $tratamiento->diagnostico_agregado = $request->diagnosticoAgregado ? $request->diagnosticoAgregado : '';
-                $tratamiento->diagnostico_egreso = !$request->diagnosticoEgreso ? '' : $request->diagnosticoEgreso;
-                $tratamiento->laboratorios = $request->laboratorios ? $request->laboratorios : '';
-                if ($tratamiento->save()) {
-                    try {
-                        $hospitalizacion = new Hospitalizacion();
-                        $hospitalizacion->paciente_id = $paciente->id;
-                        $hospitalizacion->medicamento = $request->medicamento ? $request->medicamento : '';
-                        $hospitalizacion->dosis_max = $request->dosisMaxima ? $request->dosisMaxima : '';
-                        $hospitalizacion->dosis_administrada = $request->dosisAdministrada ? $request->dosisAdministrada : '';
-                        $hospitalizacion->id_via_administracion = $request->via ? $request->via : '';
-                        $hospitalizacion->interacciones = $request->interacciones ? $request->interacciones : '';
-                        $hospitalizacion->intervalo = $request->intervalo ? $request->intervalo : '';
-                        $hospitalizacion->contraindicaciones = $request->contraindicaciones ? $request->interacciones : '';
-                        $hospitalizacion->horario = $request->horario ? $request->horario : '';
-                        $hospitalizacion->recomendacion = $request->recomendacion ? $request->recomendacion : '';
-                        $hospitalizacion->diaInicio = $request->diaInicio ? $request->diaInicio : 0;
-                        $hospitalizacion->mesInicio = $request->mesInicio ? $request->mesInicio : 0;
-                        $hospitalizacion->anioInicio = $request->anioInicio ? $request->anioInicio : 0;
-                        $hospitalizacion->diaTermino = $request->diaTermino ? $request->diaTermino : 0;
-                        $hospitalizacion->mesTermino = $request->mesTermino ? $request->mesTermino : 0;
-                        $hospitalizacion->anioTermino = $request->anioTermino ? $request->anioTermino : 0;
-                        $hospitalizacion->intervencion = $request->intervencion ? $request->intervencion : '';
-                        $hospitalizacion->otros = $request->otros ? $request->otros : '';
-                        $hospitalizacion->accion_tomada = $request->accionTomada ? $request->accionTomada : '';
-                        $hospitalizacion->opcion_duplicidad = !$request->opcion_duplicidad ? '' : $request->opcion_duplicidad;
-                        $hospitalizacion->opcion_intervencion = !$request->opcion_intervencion ? '' : $request->opcion_intervencion;
-                        $hospitalizacion->opcion_aceptacion = !$request->opcion_aceptacion ? '' : $request->opcion_aceptacion;
-                        $hospitalizacion->opcion_sin_cambios = !$request->opcion_sin_cambios ? 'Sin cambios' : $request->opcion_sin_cambios;
-                        $hospitalizacion->estatus = 1;
-                        if ($hospitalizacion->save()) {
-                            return redirect()->route('enHospital')->with('success', "Se registro el nuevo dia del paciente");
+                                        $hospitalizacion->estatus = 1;
+                                        if ($hospitalizacion->save()) {
+                                            return redirect()->route('enHospital')->with('success', "Se registro el nuevo dia del paciente");
+                                        } else {
+                                            return redirect()->back()->withErrors(['error' => "Error al tratar de registrar el medicamento..."]);
+                                        }
+                                    } catch (\Exception $e) {
+                                        dd($e);
+                                        return redirect()->back()->withErrors(['error' => $e]);
+                                    }
+                                }
+                            } catch (\Exception $exception) {
+                                dd($exception);
+                                return redirect()->back()->withErrors(['error' => $exception]);
+                            }
                         } else {
-                            return redirect()->back()->withErrors(['error' => "Error al tratar de registrar el medicamento..."]);
+                            return redirect()->back()->withErrors(['error' => "Error al generar el registro de signos vitales"]);
                         }
-                    } catch (\Exception $e) {
-                        dd($e);
-                        return redirect()->back()->withErrors(['error' => $e]);
                     }
+                } catch (\Throwable $th) {
+                    return redirect()->back()->withErrors(['error' => "Error al generar el registro del nuevo día"]);
                 }
-            } catch (\Exception $exception) {
-                dd($exception);
-                return redirect()->back()->withErrors(['error' => $exception]);
+            } else {
+                return redirect()->back()->withErrors(['error' => "Error al generar el registro en Ingreso"]);
             }
-        } else {
-            return 0;
+        } catch (\Throwable $th) {
+            dd($th);
+            return redirect()->back()->withErrors(['error' => "Error al generar el registro en Ingreso"]);
         }
     }
     public function datosPaciente($paciente_id, $hospital)
@@ -524,7 +556,7 @@ class HomeController extends Controller
         $enfermedades = [];
         try {
             $id_hospital = $hospital;
-            $paciente = Pacientes::where("id_paciente", "=", $paciente_id)->first();
+            $paciente = Pacientes::find($paciente_id);
             if (!$paciente) {
                 return redirect()->back()->withErrors(['error' => 'Paciente no encontrado']);
             } else {
@@ -592,9 +624,9 @@ class HomeController extends Controller
         ];
 
         $messages = [
+            'Id.required' => 'No se recibio el id del paciente... Fvor de validar.',
             'id_hospital.required' => "El campo referencia del hospital es obligatorio",
             'nombre.required' => 'El campo Nombre es un campo obligatorio.',
-            'Id.required' => 'No se recibio el id del paciente... Fvor de validar.',
             'fecha_nac_dia.required' => 'El campo del dia de la fecha de nacimiento es un campo obligatorio.',
             'fecha_nac_mes.required' => 'El campo del mes de la fech de nacimiento es un campo obligatorio.',
             'fecha_nac_año.required' => 'El campo año de naacimiento es un campo obligatorio.',
@@ -604,26 +636,30 @@ class HomeController extends Controller
             'alergias.required' => 'El campo Alergias es un campo obligatorio.',
         ];
         $this->validate($request, $rules, $messages);
-
-        $paciente = Pacientes::find($request->Id);
-        $paciente->nombre = $request->nombre;
-        $paciente->fecha_nac_dia = $request->fecha_nac_dia;
-        $paciente->fecha_nac_mes = $request->fecha_nac_mes;
-        $paciente->fecha_nac_año = $request->fecha_nac_año;
-        $paciente->edad = $request->edad;
-        $paciente->genero = $request->genero;
-        $paciente->telefono = $request->telefono;
-        $paciente->alergias = $request->alergias;
-        if ($paciente->save()) {
-            $hospital = tablaHospital::find($request->id_hospital);
-            $hospital->paciente = $request->nombre;
-            if ($hospital->save()) {
-                return redirect()->route('enHospital')->with('success', 'Los datos del paaciente se actualizarón correctamente.');
+        try {
+            $paciente = Pacientes::find($request->Id);
+            $paciente->nombre = $request->nombre;
+            $paciente->fecha_nac_dia = $request->fecha_nac_dia;
+            $paciente->fecha_nac_mes = $request->fecha_nac_mes;
+            $paciente->fecha_nac_año = $request->fecha_nac_año;
+            $paciente->edad = $request->edad;
+            $paciente->genero = $request->genero;
+            $paciente->telefono = $request->telefono;
+            $paciente->alergias = $request->alergias;
+            if ($paciente->save()) {
+                //Se actualiza el campo nombre en la tabla de en hospital
+                $hospital = tablaHospital::find($request->id_hospital);
+                $hospital->paciente = $request->nombre;
+                if ($hospital->save()) {
+                    return redirect()->route('enHospital')->with('success', 'Los datos del paaciente se actualizarón correctamente.');
+                } else {
+                    return redirect()->back()->withErrors(['error' => 'No se pudo actualizar el registro']);
+                }
             } else {
-                return redirect()->back()->withErrors(['error' => 'No se pudo actualizar el registro']);
+                return redirect()->back()->withErrors(['error' => 'No se pudo actualizar el paciente']);
             }
-        } else {
-            return redirect()->back()->withErrors(['error' => 'No se pudo actaalizr el paciente']);
+        } catch (\Throwable $th) {
+            return redirect()->back()->withErrors(['error' => "Error al generar el registro en Hospitalización"]);
         }
     }
     public function actualizarContra(Request $request)
@@ -644,8 +680,8 @@ class HomeController extends Controller
             }
         }
     }
-    public function filtro($filtro,$fecha)
+    public function filtro($filtro, $fecha)
     {
-        return Excel::download(new HospitalizacionExport($filtro,$fecha), 'Hospitalizaciones.xlsx');
+        return Excel::download(new HospitalizacionExport($filtro, $fecha), 'Hospitalizaciones.xlsx');
     }
 }
