@@ -25,7 +25,7 @@ class HospitalizacionExport implements FromCollection,WithHeadings
     public function collection()
     {
         return Hospitalizacion::select( 
-        DB::raw("CURDATE() as fecha"),
+        "hospitalizacions.created_at as fecha",
         "p.id_paciente",
         "p.nombre",
         "hospitalizacions.medicamento",
@@ -47,11 +47,8 @@ class HospitalizacionExport implements FromCollection,WithHeadings
         "hospitalizacions.otros",
         "hospitalizacions.accion_tomada")
         ->join("pacientes as p","p.id","=","hospitalizacions.paciente_id")
-        ->where("paciente_id","=", $this->pacienteId)
-        ->whereDate(
-            DB::raw("CONCAT(anioInicio, '-', LPAD(mesInicio, 2, '0'), '-', LPAD(diaInicio, 2, '0'))"),
-            now()->toDateString()
-        )
+        ->where("p.id","=", $this->pacienteId)
+        ->where("hospitalizacions.created_at", "like", $this->fecha.'%')
         ->get();
     }
     /**

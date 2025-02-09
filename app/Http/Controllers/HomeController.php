@@ -215,11 +215,10 @@ class HomeController extends Controller
     public function reporteServicio(Request $request)
     {
         $hospitalizados = tablaHospital::select("tabla_hospitals.*", "p.id as pacienteSQL")
-            ->join("pacientes as p", "p.id_paciente", "=", "tabla_hospitals.id_paciente")
-            ->where("id_estatus", "=", 1)
+            ->join("pacientes as p", "p.id", "=", "tabla_hospitals.id_paciente")
+            ->where("tabla_hospitals.id_estatus", "=", 1)
             ->orderBy('fecha', 'desc')
             ->get();
-
         return view("reporteServicio", compact("hospitalizados"));
     }
     public function seguimientoTratamiento()

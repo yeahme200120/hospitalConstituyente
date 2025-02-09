@@ -8,6 +8,7 @@ use App\Models\Ingresos;
 use App\Models\Pacientes;
 use App\Models\SignosVitales;
 use App\Models\Diagnosticos;
+use App\Models\tablaHospital;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Date;
@@ -42,7 +43,7 @@ class ExportacionesController extends Controller
                     "Diagnostico de Ingreso",
                     "Servicio",
                     "Cama",
-                    "FC",
+                   /*  "FC",
                     "FR",
                     "TA",
                     "Temperatura",
@@ -52,66 +53,26 @@ class ExportacionesController extends Controller
                     "Medico tratante",
                     "Laboratorios",
                     "Diagnostico Agregado",
-                    "Diagnostico Egreso"
+                    "Diagnostico Egreso" */
                 ];
                 $sheet->fromArray($headers, null, 'A1'); // Inserta las cabeceras en la primera fila
                 // Recupera los datos
-
-                        /* $datos = Pacientes::select(
-                            DB::raw("DATE_FORMAT(hospital.fecha, '%d-%m-%Y') as fecha"),
-                            "pacientes.id_paciente as id_paciente",
-                            "pacientes.nombre as nombre",
-                            DB::raw("CONCAT(LPAD(pacientes.fecha_nac_dia, 2, '0'), '-', LPAD(pacientes.fecha_nac_mes, 2, '0'), '-', pacientes.fecha_nac_año) as fecha_nacimiento"),
-                            'pacientes.edad',
-                            "pacientes.genero",
-                            "pacientes.id_enfermedad_cronica",
-                            "pacientes.telefono",
-                            "pacientes.alergias",
-                            DB::raw("CONCAT(LPAD(ing.ingreso_dia, 2, '0'), '-', LPAD(ing.ingreso_mes, 2, '0'), '-', ing.ingreso_año) as fecha_ingreso"),
-                            "ing.ingreso_hora",
-                            "ing.diagnostico",
-                             "servicio.servicio as servicio",
-                             "camas.cama",
-                             "signos.frecuencia_cardiaca as fc",
-                             "signos.frecuencia_respiratoria as fr",
-                             "signos.tension_arterial as ta",
-                             "signos.temperatura as temperatura",
-                             "signos.oxigenacion",
-                             "signos.peso",
-                             "signos.talla",
-                             "medico.nombre as medico",
-                             "tr.diagnostico_agregado",
-                             "tr.diagnostico_egreso",
-                             "tr.laboratorios"
-
-                            )
-                            ->join("tabla_hospitals as hospital","hospital.id_paciente","=","pacientes.id_paciente")
-                            ->join("ingresos as ing","ing.paciente_id","=","pacientes.id")
-                            ->join("catalogo_servicios as servicio","servicio.id","=","ing.id_servicio")
-                            ->join("catalogo_camas as camas","camas.id","=","ing.id_cama")
-                            ->join("signos_vitales as signos","signos.paciente_id","=","pacientes.id")
-                            ->join("Diagnosticoss as tr","tr.paciente_id","=","pacientes.id")
-                            ->join("catalogo_medicos as medico","medico.id","=","tr.id_medico")
-                            ->where("hospital.fecha",">=",$fecha_inicio)
-                            ->where("hospital.fecha","<=",$fecha_fin)
-                            ->orderBy('fecha', 'desc')
-                            ->get(); */
-                            $datos = Pacientes::select(
-                                DB::raw("DATE_FORMAT(hospital.fecha, '%d-%m-%Y') as fecha"),
-                                "pacientes.id_paciente",
-                                "pacientes.nombre",
-                                DB::raw("DATE_FORMAT(CONCAT_WS('-', pacientes.fecha_nac_año, LPAD(pacientes.fecha_nac_mes, 2, '0'), LPAD(pacientes.fecha_nac_dia, 2, '0')), '%d-%m-%Y') as fecha_nacimiento"),
-                                "pacientes.edad",
-                                "pacientes.genero",
-                                "pacientes.id_enfermedad_cronica",
-                                "pacientes.telefono",
-                                "pacientes.alergias",
+                            $datos = tablaHospital::select(
+                                "tabla_hospitals.fecha as fecha",
+                                "paciente.id_paciente",
+                                "paciente.nombre",
+                                DB::raw("DATE_FORMAT(CONCAT_WS('-', paciente.fecha_nac_año, LPAD(paciente.fecha_nac_mes, 2, '0'), LPAD(paciente.fecha_nac_dia, 2, '0')), '%d-%m-%Y') as fecha_nacimiento"),
+                                "paciente.edad",
+                                "paciente.genero",
+                                "paciente.id_enfermedad_cronica",
+                                "paciente.telefono",
+                                "paciente.alergias",
                                 DB::raw("DATE_FORMAT(CONCAT_WS('-', ing.ingreso_año, LPAD(ing.ingreso_mes, 2, '0'), LPAD(ing.ingreso_dia, 2, '0')), '%d-%m-%Y') as fecha_ingreso"),
                                 "ing.ingreso_hora",
                                 "ing.diagnostico",
                                 "servicio.servicio",
                                 "camas.cama",
-                                "signos.frecuencia_cardiaca as fc",
+                                /* "signos.frecuencia_cardiaca as fc",
                                 "signos.frecuencia_respiratoria as fr",
                                 "signos.tension_arterial as ta",
                                 "signos.temperatura",
@@ -121,29 +82,19 @@ class ExportacionesController extends Controller
                                 "medico.nombre as medico",
                                 "tr.diagnostico_agregado",
                                 "tr.diagnostico_egreso",
-                                "tr.laboratorios"
+                                "tr.laboratorios" */
                             )
-                            ->join("tabla_hospitals as hospital", "hospital.id_paciente", "=", "pacientes.id_paciente")
-                            ->leftJoin("ingresos as ing", function ($join) {
-                                $join->on("ing.paciente_id", "=", "pacientes.id")
-                                     ->orderByDesc("ing.created_at") // Tomar el último registro
-                                     ->limit(1);
-                            })
-                            ->join("catalogo_servicios as servicio", "servicio.id", "=", "ing.id_servicio")
-                            ->join("catalogo_camas as camas", "camas.id", "=", "ing.id_cama")
-                            ->leftJoin("signos_vitales as signos", function ($join) {
-                                $join->on("signos.paciente_id", "=", "pacientes.id")
-                                     ->orderByDesc("signos.created_at") // Tomar el último registro
-                                     ->limit(1);
-                            })
-                            ->leftJoin("Diagnosticoss as tr", function ($join) {
-                                $join->on("tr.paciente_id", "=", "pacientes.id")
-                                     ->orderByDesc("tr.created_at") // Tomar el último tratamiento
-                                     ->limit(1);
-                            })
-                            ->join("catalogo_medicos as medico", "medico.id", "=", "tr.id_medico")
-                            ->whereBetween("hospital.fecha", [$fecha_inicio, $fecha_fin])
-                            ->orderByDesc('hospital.fecha')
+                            ->join("pacientes as paciente", "tabla_hospitals.id_paciente", "=", "paciente.id")
+                            ->join("ingresos as ing", "ing.paciente_id", "=", "paciente.id")
+                            ->leftjoin("catalogo_servicios as servicio", "servicio.id", "=", "ing.id_servicio")
+                            ->leftjoin("catalogo_camas as camas", "camas.id", "=", "ing.id_cama")
+                            /* ->join("signos_vitales as signos", 'signos.paciente_id', '=', 'paciente.id')
+                            ->join("diagnosticos as tr", 'tr.paciente_id', '=', 'paciente.id')
+                            ->join("catalogo_medicos as medico", "medico.id", "=", "tr.id_medico") */
+                            ->where("fecha", ">=",$fecha_inicio)
+                            ->where("fecha","<=",  $fecha_fin)
+                            ->orderByDesc('fecha')
+                            ->distinct()
                             ->get();
                             
                 break;
