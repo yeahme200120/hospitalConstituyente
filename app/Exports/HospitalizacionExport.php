@@ -25,7 +25,7 @@ class HospitalizacionExport implements FromCollection,WithHeadings
     public function collection()
     {
         return Hospitalizacion::select( 
-        "hospitalizacions.created_at as fecha",
+        "hospitalizacions.fecha",
         "p.id_paciente",
         "p.nombre",
         "hospitalizacions.medicamento",
@@ -48,7 +48,7 @@ class HospitalizacionExport implements FromCollection,WithHeadings
         "hospitalizacions.accion_tomada")
         ->join("pacientes as p","p.id","=","hospitalizacions.paciente_id")
         ->where("p.id","=", $this->pacienteId)
-        ->where("hospitalizacions.created_at", "like", $this->fecha.'%')
+        ->where("hospitalizacions.fecha", "like", $this->fecha.'%')
         ->get();
     }
     /**

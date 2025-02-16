@@ -72,27 +72,13 @@ class ExportacionesController extends Controller
                                 "ing.diagnostico",
                                 "servicio.servicio",
                                 "camas.cama",
-                                /* "signos.frecuencia_cardiaca as fc",
-                                "signos.frecuencia_respiratoria as fr",
-                                "signos.tension_arterial as ta",
-                                "signos.temperatura",
-                                "signos.oxigenacion",
-                                "signos.peso",
-                                "signos.talla",
-                                "medico.nombre as medico",
-                                "tr.diagnostico_agregado",
-                                "tr.diagnostico_egreso",
-                                "tr.laboratorios" */
                             )
                             ->join("pacientes as paciente", "tabla_hospitals.id_paciente", "=", "paciente.id")
                             ->join("ingresos as ing", "ing.paciente_id", "=", "paciente.id")
                             ->leftjoin("catalogo_servicios as servicio", "servicio.id", "=", "ing.id_servicio")
                             ->leftjoin("catalogo_camas as camas", "camas.id", "=", "ing.id_cama")
-                            /* ->join("signos_vitales as signos", 'signos.paciente_id', '=', 'paciente.id')
-                            ->join("diagnosticos as tr", 'tr.paciente_id', '=', 'paciente.id')
-                            ->join("catalogo_medicos as medico", "medico.id", "=", "tr.id_medico") */
-                            ->where("fecha", ">=",$fecha_inicio)
-                            ->where("fecha","<=",  $fecha_fin)
+                            ->where("tabla_hospitals.fecha", ">=",$fecha_inicio)
+                            ->where("tabla_hospitals.fecha","<=",  $fecha_fin)
                             ->orderByDesc('fecha')
                             ->distinct()
                             ->get();

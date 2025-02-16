@@ -6,7 +6,7 @@
     </div>
     <div class="container mt-3">
         <div class="accordion" id="accordionPanelsStayOpenExample">
-            <form id="redirect-form" action="{{ route('returnHome') }}" method="POST">
+            {{-- <form id="redirect-form" action="{{ route('returnHome') }}" method="POST">
                 @csrf
                 <div class="row justify-content-end p-1" title="Sin cambios">
                     <div class="col-3">
@@ -17,7 +17,7 @@
                         </button>
                     </div>
                 </div>
-            </form>
+            </form> --}}
             <form action="/registrarSeguimiento2" method="POST" class="mt-3 container">
                 @csrf   
                 <div class="accordion-item">
@@ -35,9 +35,21 @@
                                 <div class="card mb-4">
                                     <div class="card-body">
                                         <input type="hidden" id="pacienteId" name="pacienteId" value="{{ $paciente }}">
+                                        <input type="hidden" id="fechaGlobal" name="fechaGlobal" value="{{ $fechaG }}">
+
                                         @error('pacienteId')
                                             <div class="alert alert-danger">{{ $message }}</div>
                                         @enderror
+                                        
+                                        <div class="row mb-3">
+                                            <label for="fecha_registro" class="col-sm-2 col-form-label">Fecha de Registro:</label>
+                                            <div class="col-12 col-md-10">
+                                                <div class="form-group">
+                                                    <input type="date" class="form-control" id="fecha_registro", name="fecha_registro">
+                                                </div>
+                                            </div>
+                                        </div>
+
                                         <div class="row mb-3">
                                             <label for="medicoTratante" class="col-sm-2 col-form-label">Médico
                                                 Tratante:</label>
@@ -480,6 +492,15 @@
                     toastr.error("{{ $error }}");
                 @endforeach
             @endif
+            const today = new Date();
+
+            // Establecer la fecha como el valor 'YYYY-MM-DD'
+            const localDate = today.getFullYear() + '-' 
+                            + String(today.getMonth() + 1).padStart(2, '0') + '-' 
+                            + String(today.getDate()).padStart(2, '0');
+
+            // Asignar la fecha actual al campo de fecha
+            document.getElementById("fecha_registro").value = localDate;
         });
     </script>
 @endsection

@@ -69,6 +69,7 @@ class HomeController extends Controller
     }
     public function registrarSeguimiento(Request $request)
     {
+        $fechaGlobal =  $request->fecha_registro ? $request->fecha_registro : date(now());
         $rules = [
             'nombre' => 'required',
             'id' => 'required',
@@ -161,6 +162,7 @@ class HomeController extends Controller
         $ingreso->diagnostico = $request->diagnostico_ingreso;
         $ingreso->id_servicio = $request->servicio;
         $ingreso->id_cama = $request->cama;
+        $ingreso->fecha =  $fechaGlobal;
 
         if ($ingreso->save()) {
             //Si se guardo correctamente los ingresos
@@ -171,7 +173,7 @@ class HomeController extends Controller
                 $tabla = new tablaHospital();
                 $tabla->paciente =  $request->nombre;
                 $tabla->id_paciente = $request->id;
-                $tabla->fecha =  date(now());
+                $tabla->fecha =  $fechaGlobal;
                 $tabla->hora =  date("H:i:s");
                 $tabla->servicio =  $serv->servicio;
                 $tabla->id_servicio =  $serv->id;
@@ -191,9 +193,9 @@ class HomeController extends Controller
                     $signos->oxigenacion = $request->oxigenacion ? $request->oxigenacion : '';
                     $signos->peso = $request->peso ? $request->peso : '';
                     $signos->talla = $request->talla ?  $request->talla : '';
-
+                    $signos->fecha =  $fechaGlobal;
                     if ($signos->save()) {
-                        return redirect()->route('seguimientoTratamiento', ['paciente' => $paciente->id])
+                        return redirect()->route('seguimientoTratamiento', ['paciente' => $paciente->id, 'fecha' => $fechaGlobal])
                             ->with('success', 'Registro correcto de Informacion personal, Ingresos y Signos Vitales');
                     } else {
                         return redirect()->back()->withErrors(['error' => "Error al generar el registro en Signos Vitales"]);
@@ -229,17 +231,18 @@ class HomeController extends Controller
         $vias = CatalogoViaAdministracion::all();
         return view("seguimientoTratamiento", compact("pacientes", "medicos", "vias"));
     }
-    public function seguimientoTratamientoId($id)
+    public function seguimientoTratamientoId($id,$fechaG)
     {
         //Seccion de los
-
+        $fechaGlobal = date($fechaG);
         $paciente = $id;
         $medicos = CatalogoMedicos::all();
         $vias = CatalogoViaAdministracion::all();
-        return view("seguimientoTratamiento", compact("paciente", "medicos", "vias"));
+        return view("seguimientoTratamiento", compact("paciente", "medicos", "vias","fechaG"));
     }
     public function registrarSeguimiento2(Request $request)
     {
+        $fechaGlobal = date($request->fechaGlobal?$request->fechaGlobal:now());
         $rules = [
             'pacienteId' => 'required',
             'medicoTratante' => 'required',
@@ -278,13 +281,14 @@ class HomeController extends Controller
 
         //Registro de Tratamiento
         try {
-            $tratamiento = new Diagnosticos();
-            $tratamiento->paciente_id = $request->pacienteId;
-            $tratamiento->id_medico = $request->medicoTratante ? $request->medicoTratante : 0;
-            $tratamiento->diagnostico_agregado = $request->diagnosticoAgregado ? $request->diagnosticoAgregado : '';
-            $tratamiento->diagnostico_egreso = !$request->diagnosticoEgreso ? '' : $request->diagnosticoEgreso;
-            $tratamiento->laboratorios = $request->laboratorios ? $request->laboratorios : '';
-            if ($tratamiento->save()) {
+            $diagnostico = new Diagnosticos();
+            $diagnostico->paciente_id = $request->pacienteId;
+            $diagnostico->id_medico = $request->medicoTratante ? $request->medicoTratante : 0;
+            $diagnostico->diagnostico_agregado = $request->diagnosticoAgregado ? $request->diagnosticoAgregado : '';
+            $diagnostico->diagnostico_egreso = !$request->diagnosticoEgreso ? '' : $request->diagnosticoEgreso;
+            $diagnostico->laboratorios = $request->laboratorios ? $request->laboratorios : '';
+            $diagnostico->fecha = $fechaGlobal;
+            if ($diagnostico->save()) {
                 //Si registro tratamientos todo Ok
                 //Registro de Hospitalización
                 try {
@@ -309,6 +313,7 @@ class HomeController extends Controller
                     $hospitalizacion->otros = $request->otros ? $request->otros : '';
                     $hospitalizacion->accion_tomada = $request->accionTomada ? $request->accionTomada : '';
                     $hospitalizacion->estatus = 1;
+                    $hospitalizacion->fecha = $fechaGlobal;
 
                     if ($hospitalizacion->save()) {
                         return redirect()->route('enHospital')->with('success', 'Registro correcto de Tratamiento y hospitalización');
@@ -320,11 +325,12 @@ class HomeController extends Controller
                 return redirect()->back()->withErrors(['error' => "Error al generar el registro en Hospitalización"]);
             }
         } catch (\Throwable $th) {
-            return redirect()->back()->withErrors(['error' => "Error al generar el registro en Trtatamientos"]);
+            return redirect()->back()->withErrors(['error' => "Error al generar el registro del Diagnostico"]);
         }
     }
     public function agregarMedicamento2(Request $request)
     {
+        $fechaGlobal = $request->fechaGlobal?date($request->fechaGlobal):now();
         try {
             //Registro de Hospitalización
             $hospitalizacion = new Hospitalizacion();
@@ -348,7 +354,7 @@ class HomeController extends Controller
             $hospitalizacion->intervencion = $request->intervencion ? $request->intervencion : '';
             $hospitalizacion->otros = $request->otros ? $request->otros : '';
             $hospitalizacion->accion_tomada = $request->accion_tomada ? $request->accion_tomada : '';
-
+            $hospitalizacion->fecha = $fechaGlobal;
 
             if ($hospitalizacion->save()) {
                 return 1;

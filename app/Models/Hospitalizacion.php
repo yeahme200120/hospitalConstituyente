@@ -26,6 +26,7 @@ class Hospitalizacion extends Model
         "recomendacion",
         "otros",
         "accion_tomada",
-        "estatus"
+        "estatus",
+        "fecha"
     ];
 }

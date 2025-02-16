@@ -15,5 +15,6 @@ class SignosVitales extends Model
         'oxigenacion',
         'peso',
         'talla',
+        'fecha',
     ];
 }

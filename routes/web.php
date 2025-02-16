@@ -19,7 +19,7 @@ Route::post('/agregarMedicamento', [App\Http\Controllers\HomeController::class, 
 Route::get('/enHospital', [App\Http\Controllers\HomeController::class, 'enHospital'])->name('enHospital');
 Route::post('/registrarSeguimiento2', [App\Http\Controllers\HomeController::class, 'registrarSeguimiento2'])->name('registrarSeguimiento2');
 Route::get('/seguimientoTratamiento', [App\Http\Controllers\HomeController::class, 'seguimientoTratamiento'])->name('seguimientoTratamiento');
-Route::get('/seguimientoTratamientoId/{paciente}', [App\Http\Controllers\HomeController::class, 'seguimientoTratamientoId'])->name('seguimientoTratamiento');
+Route::get('/seguimientoTratamientoId/{paciente}/{fecha}', [App\Http\Controllers\HomeController::class, 'seguimientoTratamientoId'])->name('seguimientoTratamiento');
 Route::get('/cambios/{paciente}/{hospital}', [App\Http\Controllers\HomeController::class, 'cambios'])->name('cambios');
 Route::post('/actualizacionCambios', [App\Http\Controllers\HomeController::class, 'actualizacionCambios'])->name('actualizacionCambios');
 Route::get('/datosPaciente/{paciente}/{hospital}', [App\Http\Controllers\HomeController::class, 'datosPaciente'])->name('datosPaciente');

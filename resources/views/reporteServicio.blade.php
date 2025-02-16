@@ -94,10 +94,10 @@
             $("#edad").val(edad);
         }
         function filtrar(paciente){
-            console.log("Paceinte: ",paciente);
+            console.log("Paciente: ",paciente);
             let filtro = paciente.pacienteSQL;
             let fec = paciente.fecha;
-            console.log("Valor: ", filtro, "Fecha", fec);
+            console.log("Filtro: ", filtro, "Fecha", fec);
             window.location.href = `/filtro/${filtro}/${fec}`;
         }
     </script>

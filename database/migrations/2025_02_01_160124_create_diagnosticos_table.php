@@ -18,6 +18,7 @@ return new class extends Migration
             $table->string("diagnostico_agregado");
             $table->string("diagnostico_egreso")->nullable();
             $table->string("laboratorios");
+            $table->date("fecha");
             $table->timestamps();
         });
     }

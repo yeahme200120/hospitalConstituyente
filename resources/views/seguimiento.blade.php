@@ -33,6 +33,12 @@
                                             </select>
                                         </div>
                                     </div>
+                                    <div class="col-12 col-md-6">
+                                        <div class="form-group">
+                                            <label for="nombre">Fecha de Registro:</label>
+                                            <input type="date" class="form-control" id="fecha_registro", name="fecha_registro">
+                                        </div>
+                                    </div>
                                 </div>
                                 <!-- Nombre completo -->
                                 <div class="row">
@@ -422,6 +428,16 @@
             @if (session('success'))
                 toastr.success("{{ session('success') }}");
             @endif
+
+            const today = new Date();
+
+            // Establecer la fecha como el valor 'YYYY-MM-DD'
+            const localDate = today.getFullYear() + '-' 
+                            + String(today.getMonth() + 1).padStart(2, '0') + '-' 
+                            + String(today.getDate()).padStart(2, '0');
+
+            // Asignar la fecha actual al campo de fecha
+            document.getElementById("fecha_registro").value = localDate;
         });
 
         function calculaEdad() {

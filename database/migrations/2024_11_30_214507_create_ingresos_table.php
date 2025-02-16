@@ -21,6 +21,7 @@ return new class extends Migration
             $table->string("diagnostico");
             $table->integer("id_servicio");
             $table->integer("id_cama");
+            $table->date("fecha");
             $table->timestamps();
         });
     }

@@ -21,7 +21,7 @@ class IngresosExport implements FromCollection
             "ingreso_hora",
             "diagnostico",
             "id_servicio",
-            "id_cama"
+            "id_cama",
         )->get();
     }
     /**

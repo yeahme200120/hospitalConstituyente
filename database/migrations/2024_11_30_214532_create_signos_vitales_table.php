@@ -21,6 +21,7 @@ return new class extends Migration
             $table->string("oxigenacion");
             $table->string("peso");
             $table->string("talla");
+            $table->date("fecha");
             $table->timestamps();
         });
         

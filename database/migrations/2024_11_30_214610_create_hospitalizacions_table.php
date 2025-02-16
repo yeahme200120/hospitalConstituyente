@@ -33,6 +33,7 @@ return new class extends Migration
             $table->string("otros");
             $table->string("accion_tomada");
             $table->integer("estatus");
+            $table->date("fecha");
             $table->timestamps();
         });
     }

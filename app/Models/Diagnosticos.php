@@ -11,6 +11,7 @@ class Diagnosticos extends Model
         'id_medico',
         'diagnostico_agregado',
         'diagnostico_egreso',
-        'laboratorios'
+        'laboratorios',
+        'fecha'
     ];
 }
