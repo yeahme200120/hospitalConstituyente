@@ -161,7 +161,7 @@
                                                     name="enfermedades_cronicas[]" multiple="multiple">
                                                     <option value="" disabled {{ old('enfermedades_cronicas') ? '' : 'selected' }}>Selecciona una opción...</option>
                                                     @foreach ($enfermedades as $enfermedad)
-                                                        <option value="{{ $enfermedad->id }}">
+                                                        <option value="{{ $enfermedad->enfermedad }}">
                                                             {{ $enfermedad->enfermedad }}</option>
                                                     @endforeach
                                                 </select>
